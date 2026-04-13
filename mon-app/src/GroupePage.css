@@ -1,0 +1,333 @@
+.groupe-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--gris-fond);
+  color: var(--text-main);
+}
+
+.groupe-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  background: var(--blanc);
+  border-bottom: 0.1rem solid var(--border-color);
+  box-shadow: var(--shadow);
+}
+
+.groupe-info {
+  flex: 1;
+}
+
+.groupe-info h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--bleu-fonce);
+}
+
+.groupe-info span {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+}
+
+.back-btn {
+  background: var(--gris-fond);
+  border: 0.1rem solid var(--border-color);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  color: var(--text-main);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.back-btn:hover {
+  background: var(--bleu-fonce);
+  color: white;
+}
+
+.chat-zone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 1rem 2rem;
+  gap: 1rem;
+}
+
+.messages-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.5rem;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  max-width: 60%;
+}
+
+.message.mine {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.message.theirs {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.msg-auteur {
+  font-size: 0.75rem;
+  color: var(--text-sub);
+  margin-bottom: 0.2rem;
+  font-weight: 600;
+}
+
+.msg-bubble {
+  background: var(--blanc);
+  padding: 0.6rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  border: 0.1rem solid var(--border-color);
+}
+
+.message.mine .msg-bubble {
+  background: var(--bleu-fonce);
+  color: white;
+  border: none;
+}
+
+.msg-heure {
+  font-size: 0.7rem;
+  color: var(--text-sub);
+  margin-top: 0.2rem;
+}
+
+.chat-input {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--blanc);
+  border-radius: 0.75rem;
+  border: 0.1rem solid var(--border-color);
+}
+
+.chat-input input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  outline: none;
+}
+
+.chat-input input::placeholder {
+  color: var(--text-sub);
+}
+
+.chat-input button {
+  background: var(--bleu-fonce);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chat-input button:hover {
+  background: var(--vert-clair);
+}
+
+
+
+.dropdown-chat-menu {
+  position: absolute;
+  top: 50px;
+  right: 10px;
+  background: #1c242f; /* Couleur sombre style Telegram */
+  border-radius: 12px;
+  width: 250px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  padding: 8px 0;
+  z-index: 1000;
+  color: white;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  width: 100%;
+  border: none;
+  background: none;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.menu-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.menu-item svg {
+  margin-right: 15px;
+  opacity: 0.7;
+}
+
+.danger-text {
+  color: #ff595a !important;
+}
+
+.admin-header {
+  padding: 10px 16px;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #708499;
+  font-weight: bold;
+}
+
+
+.pinned-banner button {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-left: auto; /* Pousse le X tout à droite */
+    padding: 0 10px;
+    opacity: 0.7;
+}
+
+.pinned-banner button:hover {
+    opacity: 1;
+    color: #ff4757; /* Un petit rouge discret au survol */
+}
+
+
+/* Overlay : l'arrière-plan semi-transparent */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7); /* Effet d'assombrissement */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px); /* Petit effet de flou pour le style */
+}
+
+/* Le contenu de la fenêtre */
+.modal-content {
+  background: var(--bg-secondary, #2c2f33); /* S'adapte à ton thème Discord-style */
+  color: white;
+  padding: 1.5rem;
+  border-radius: 0.8rem;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 0.5rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+/* Section d'ajout de membre */
+.add-member-section {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.add-member-section input {
+  flex: 1;
+  padding: 0.6rem;
+  border-radius: 0.4rem;
+  border: none;
+  background: #23272a;
+  color: white;
+}
+
+.add-member-section button {
+  background: #5865f2; /* Bleu type Discord/Flow */
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-member-section button:hover {
+  background: #4752c4;
+}
+
+/* Liste des membres dans le modal */
+.members-list-admin {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.member-row {
+  display: flex;
+  justify-content: space-between; /* Pousse le nom à gauche et le bouton à droite */
+  align-items: center;
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.05);
+  margin-bottom: 0.5rem;
+  border-radius: 0.4rem;
+  transition: background 0.2s;
+}
+
+.member-row:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.remove-member-btn {
+  background: transparent;
+  border: none;
+  color: #ff4757; /* Un rouge corail pour signaler l'action */
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.remove-member-btn:hover {
+  background: rgba(255, 71, 87, 0.1);
+  transform: scale(1.1);
+}
+.kick-btn {
+  background: #ed4245;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.3rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.kick-btn:hover {
+  background: #c03537;
+}

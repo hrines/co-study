@@ -1,0 +1,43 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Ta nouvelle palette Co'study */
+  --gris-fond: #EFEFEF;    /* Le gris clair de ton image */
+  --blanc: #ffffff;
+  --bleu-fonce: #112B3C;   /* Le bleu très foncé (haut de l'image) */
+  --bleu-moyen: #205375;   /* Le bleu intermédiaire */
+  --orange-accent: #F66B0E; /* L'orange vif pour les boutons */
+  
+  /* Variables de texte et structure */
+  --text-main: #112B3C;
+  --text-sub: #546e7a;     /* Un gris-bleu qui va bien avec ta palette */
+  --border-color: #cfd8dc;
+  --shadow: 0 0.4rem 1.2rem rgba(17, 43, 60, 0.1);
+  --transition: all 0.3s ease;
+}
+
+body.dark {
+  /* On adapte les nouvelles couleurs pour le dark mode */
+  --gris-fond: #0a141d;
+  --blanc: #112B3C;        /* On utilise le bleu foncé comme fond de carte */
+  --text-main: #ffffff;
+  --border-color: #205375;
+  --bleu-fonce: #0f172a;
+  --text-sub: #94a3b8;
+}
+
+.auth-btn, .cta-orange {
+  background-color: var(--orange-accent);
+  color: white;
+  border: none;
+  transition: var(--transition);
+}
+
+.auth-btn:hover {
+  filter: brightness(1.1); /* Ça l'éclaircit un peu au survol */
+  transform: translateY(-2px);
+}

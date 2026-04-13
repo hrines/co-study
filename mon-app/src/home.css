@@ -1,0 +1,484 @@
+
+
+/* --- 1. VARIABLES CO'STUDY (LA BASE) --- */
+:root {
+  /* Ta nouvelle palette d'images */
+  --gris-fond: #EFEFEF;    
+  --blanc: #ffffff;
+  --bleu-fonce: #112B3C;   /* Sidebar et Headers */
+  --bleu-moyen: #205375;   /* Éléments secondaires */
+  --orange-accent: #F66B0E; /* Boutons et actions */
+  
+  --text-main: #112B3C;
+  --text-sub: #546e7a;
+  --border-color: #cfd8dc;
+  --shadow: 0 0.4rem 1.2rem rgba(17, 43, 60, 0.08);
+  --transition: all 0.3s ease;
+}
+
+body.dark {
+  --gris-fond: #0a141d;
+  --blanc: #112B3C;
+  --text-main: #ffffff;
+  --border-color: #205375;
+  --bleu-fonce: #070d14;
+  --text-sub: #94a3b8;
+}* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--gris-fond);
+  color: var(--text-main);
+  transition: background 0.6s ease, color 0.3s ease;
+}
+/* --- 2. LAYOUT PRINCIPAL --- */
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* --- 3. SIDEBAR --- */
+.sidebar {
+  width: 20%;
+  min-width: 15rem;
+  background-color: var(--bleu-fonce);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+/* Tes widgets/cartes */
+.card {
+  background-color: var(--blanc);
+  border: 0.1rem solid var(--border-color);
+  color: var(--text-main);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+/* État quand la sidebar est rangée */
+.dashboard-layout.collapsed .sidebar {
+  width: 5.5rem;
+  min-width: 5.5rem;
+  padding: 1.5rem 0.5rem;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--vert-clair);
+  letter-spacing: 0.1rem;
+  white-space: nowrap;
+}
+
+.toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--vert-clair);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+
+
+.sidebar-menu {
+    padding: 0.625rem;
+    color: white;
+}
+
+.menu-item {
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0.625rem;
+    background: rgba(255,255,255,0.1);
+    border-radius: 0.3125rem;
+}
+
+/* Décalage Niveau 1 (LMD / Ingénieur) */
+.cascade-level-1 {
+    margin-left: 1.3rem;
+    border-left: 0.125rem solid rgba(255,255,255,0.2);
+    margin-top: 0.3125rem;
+}
+
+
+/* Décalage Niveau 2 (L1, L2...) */
+.cascade-level-2 {
+    margin-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3125rem;
+    border-left: 0.0625rem dashed rgba(255,255,255,0.3);
+}
+
+.leaf-item {
+    background: transparent;
+    border: none;
+    color: #bdc3c7;
+    text-align: left;
+    padding: 0.3125rem 0.9375rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.leaf-item:hover {
+    color: #2ecc71;
+    transform: translateX(0.5rem); /* Petit effet de glisse au survol */
+}
+
+
+
+
+.dashboard-layout.collapsed .sidebar-header {
+  justify-content: center;
+}
+
+.dashboard-layout.collapsed .logo {
+  display: none;
+}
+/* Menu de Navigation */
+.nav-menu {
+  flex-grow: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.6rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.notif-count {
+  position: absolute;
+  top: -0.2rem;
+  right: -0.3rem;
+  background: #ff4d4d;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding-left: 1.2rem;
+}
+
+.nav-item.active {
+  background-color: var(--vert-clair);
+  color: white;
+}
+
+.dashboard-layout.collapsed .nav-item {
+  justify-content: center;
+  padding: 0.8rem;
+}
+
+.btn-small {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.8rem;
+  background-color: var(--vert-clair);
+  color: white;
+  border-radius: 0.3125rem;
+}
+
+
+.pomodoro-widget {
+  background: var(--blanc);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-top: auto;
+  margin-bottom: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: var(--shadow);
+}
+
+.pomodoro-mode {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+
+.pomodoro-timer {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--bleu-fonce);
+  letter-spacing: 0.1rem;
+}
+
+.pomodoro-controls {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.pomo-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.pomo-btn.play {
+  background: var(--vert-clair);
+  color: white;
+}
+
+.pomo-btn.reset {
+  background: var(--border-color);
+  color: var(--text-main);
+}
+
+.pomodoro-cycles {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.cycle-btn {
+  flex: 1;
+  padding: 0.4rem 0;
+  border-radius: 0.5rem;
+  border: 0.1rem solid var(--border-color);
+  background: transparent;
+  color: var(--text-sub);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.cycle-btn:hover,
+.cycle-btn.active-cycle {
+  background: var(--bleu-fonce);
+  color: white;
+  border-color: var(--bleu-fonce);
+}
+.logout-btn {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.logout-btn:hover {
+  background-color: #d32f2f;
+}
+
+/* --- 4. WRAPPER DROIT (NAVBAR + CONTENU) --- */
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--gris-fond); /* Utilisera la couleur de fond auto */
+  color: var(--text-main);           /* Utilisera la couleur de texte auto */
+  transition: background 0.3s;      /* Pour que le passage soit fluide */
+}
+
+/* Top Navbar */
+.top-navbar {
+  height: 4.5rem;
+  background-color: var(--blanc);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  box-shadow: var(--shadow);
+  border-bottom: 0.06rem solid #eee;
+  z-index: 10;
+  background-color: var(--blanc); /* Devient sombre en dark mode */
+  border-bottom: 0.1rem solid var(--border-color);
+}
+
+
+/* --- HERO SECTION --- */
+.hero-section {
+  background-color: var(--bleu-fonce);
+  color: white;
+  padding: 10rem 2rem;
+  text-align: center;
+  border-radius: 0 0 2rem 2rem; /* Arrondi léger en bas */
+  margin: -2rem -2.5rem 2rem -2.5rem; /* Pour coller aux bords du main-content */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.hero-section h1 {
+  font-size: 3rem;
+  font-weight: 800;
+}
+
+.hero-section p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+/* --- BARRE DE RECHERCHE CENTRALE --- */
+.search-container-hero {
+  position: relative;
+  width: 100%;
+  max-width: 45rem; /* Largeur de la barre */
+  margin-top: 1rem;
+}
+
+.hero-search-bar {
+  width: 100%;
+  padding: 1.2rem 4rem 1.2rem 2rem;
+  border-radius: 3rem;
+  border: none;
+  font-size: 1.1rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.2);
+}
+
+.hero-search-btn {
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.actions-section {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.btn-create {
+  background-color: var(--vert-clair);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-create:hover {
+  background-color: var(--vert-fonce);
+  transform: translateY(-0.1rem);
+}
+
+/* --- 5. ZONE DE CONTENU PRINCIPAL --- */
+.main-content {
+  flex: 1;
+  padding: 2rem 2.5rem;
+  overflow-y: auto;
+}
+
+
+
+.tab-btn {
+  background: none;
+  border: none;
+  color: #1a227ec3; /* Un peu transparent quand pas sélectionné */
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding-bottom: 0.5rem;
+  border-bottom: 0.1875rem solid transparent;
+  transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+  color: #1a237e;
+  border-bottom: 0.1875rem solid var(--vert-clair); /* Barre verte sous le choix actif */
+}
+button {
+  background: none;
+  border: none;
+  color: #000000;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: var(--transition);
+}
+button:hover {
+  background-color: rgba(43, 42, 42, 0.372);
+  transform: translateY(-0.1rem);
+}
+
+.mes-groupes p{
+color: var(--bleu-fonce);
+padding: 0.5rem 0;
+font-size: 1.1rem;
+margin: 1rem 0;
+
+}
+.mes-groupes span {
+color: var(--text-sub); 
+font-size: 1.4rem;
+padding: 0.5rem 0;
+
+}
+
+.w33 {
+  width: 28rem;
+  background-color: #333a8f1b;
+  border-radius: 0.625rem;
+  text-align: center;
+  transition: transform 0.3s ease;
+  box-shadow: 0 0.3125rem 0.9375rem #1a227e65;
+  margin: 0.625rem;
+  flex-direction: row;
+  text-align: left;
+}
+
+.w33:hover {
+  transform: translateY(-0.1rem);
+  box-shadow: 0 0.625rem 1.25rem #1a227e99;
+}
+
+
+

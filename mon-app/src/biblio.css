@@ -1,0 +1,261 @@
+/* Biblio.css - Version Optimisée Flow */
+
+.biblio-container {
+    padding: 2.5rem; /* 40px */
+    background-color: #f8faff;
+    min-height: 100vh;
+}
+
+/* 1. Layout Principal (2 colonnes) */
+.biblio-main-content {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.biblio-left {
+    flex: 3; /* Zone des dossiers */
+}
+
+.biblio-right {
+    flex: 1; /* Panneau stats StuDocu */
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+}
+
+/* 2. Bannière Upload */
+.upload-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #e9f0ff;
+    padding: 2.5rem;
+    border-radius: 1.25rem;
+    margin-bottom: 2.5rem;
+}
+
+.underline-blue {
+    border-bottom: 4px solid #1877f2;
+    padding-bottom: 0.5rem;
+    color: #2d3436;
+}
+
+.upload-dropzone {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    border: 2px dashed #1877f2;
+    text-align: center;
+    width: 18.75rem; /* 300px */
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.upload-dropzone:hover {
+    background: #f0f5ff;
+}
+
+/* 3. Filtres Année */
+.shelves-filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.shelves-filters button {
+    padding: 0.5rem 1.2rem;
+    border-radius: 2rem;
+    border: 1px solid var(--border-color);
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.shelves-filters button.active {
+    background: #1877f2;
+    color: white;
+    border-color: #1877f2;
+}
+
+/* 4. Étagères (Grille de dossiers) */
+.shelf {
+    margin-bottom: 2.5rem;
+}
+
+.shelf-title {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    border-left: 5px solid #1877f2;
+    padding-left: 1rem;
+    margin-bottom: 1.25rem;
+    color: #2d3436;
+    font-size: 1.4rem;
+}
+
+.folder-icon {
+    color: #2ecc71; /* Le vert des dossiers StuDocu */
+}
+
+/* La ligne qui contient les cartes */
+.shelf-row {
+  display: flex;
+  flex-wrap: wrap; /* Permet d'aller à la ligne si trop de fichiers */
+  gap: 20px;
+  padding: 15px 0;
+}
+
+/* La carte individuelle */
+.file-card {
+  position: relative;
+  width: 160px; /* Largeur fixe pour éviter l'écrasement */
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.file-card:hover {
+  transform: translateY(-5px);
+}
+/* Bouton favori en haut à droite */
+.star-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ccc;
+  font-size: 1.2rem;
+}
+
+.star-btn.active {
+  color: #ffc107;
+}
+.file-icon { 
+    font-size: 2.5rem; 
+    margin-bottom: 0.8rem; 
+}
+.file-info h4 {
+  font-size: 0.9rem;
+  color: #333;
+  margin: 5px 0;
+  /* TRÈS IMPORTANT : Empêche le texte de déborder */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; 
+  width: 130px; /* Doit être un peu plus petit que la carte */
+}
+.view-link {
+  font-size: 0.75rem;
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.file-info span {
+    font-size: 0.75rem;
+    color: var(--text-sub);
+}
+
+/* 6. Widget Stats (Style StuDocu) */
+.bib-stats-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 0.8rem;
+    padding: 1.5rem;
+}
+
+.bib-stats-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1.2rem;
+    color: var(--bleu-fonce);
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between; /* Valeur à droite comme StuDocu */
+    align-items: center;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid #f1f4f8;
+}
+
+.stat-label { color: #636e72; font-size: 0.9rem; }
+.stat-value { font-weight: 700; color: #2d3436; }
+
+
+/* Organisation par module */
+.module-section {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(24, 119, 242, 0.02); /* Très léger fond bleu pour grouper */
+    border-radius: 1rem;
+}
+
+.module-subtitle {
+    font-size: 1rem;
+    color: var(--bleu-fonce);
+    margin-bottom: 1rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+  gap: 10px;
+  background: #f0f4f8;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-top: 10px;
+  transition: background 0.3s;
+  user-select: none; /* Empêche de sélectionner le texte au double clic */
+  
+}
+.module-subtitle:hover {
+  background: #e2e8f0;
+}
+
+.module-subtitle::before {
+    content: "•";
+    margin-right: 0.5rem;
+    color: #1877f2;
+}
+
+/* Mise à jour de la grille pour les fichiers */
+.shelf-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+    padding-left: 20px; /* Petit décalage pour l'effet de sous-menu */
+  border-left: 2px solid #3b82f6; /* Ligne bleue comme dans ton menu de gauche */
+  margin-left: 10px;
+}
+
+
+
+.file-link {
+    text-decoration: none; /* Enlève le soulignement */
+    color: inherit; /* Garde les couleurs du texte d'origine */
+    display: block;
+    cursor: pointer;
+}
+.file-link-container {
+    text-decoration: none; /* Enlève le soulignement bleu des liens */
+    color: inherit;       /* Garde la couleur de ton texte actuel */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.file-card:hover .file-icon {
+    transform: scale(1.1);
+    transition: transform 0.2s;
+}
+.file-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}

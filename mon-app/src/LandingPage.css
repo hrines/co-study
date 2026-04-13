@@ -1,0 +1,153 @@
+/* Variables de couleurs basées sur tes captures */
+:root {
+  --blue-dark: #0f172a;
+  --blue-flow: #38bdf8;
+  --orange-action: #f97316;
+  --bg-light: #f8fafc;
+}
+
+.landing-wrapper {
+  background-color: var(--bg-light);
+  color: var(--blue-dark);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Nav style FIED */
+.main-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 5%;
+  background: white;
+  height: 10vh;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 0.2rem 1rem rgba(0,0,0,0.05);
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--blue-dark);
+  margin: 0 1.5rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.auth-btn {
+  background-color: #bee3f8;
+  color: #2c5282;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 2rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Hero Section */
+.hero-section {
+  height: 70vh;
+  background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)), 
+              url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1000&q=80'); /* Image d'étude générique */
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+}
+
+.hero-section h1 {
+  font-size: clamp(2rem, 8vw, 4rem);
+  margin-bottom: 1rem;
+}
+
+.cta-orange {
+  background-color: var(--orange-action);
+  color: white;
+  border: none;
+  padding: 1.2rem 2.5rem;
+  font-size: 1.2rem;
+  font-weight: 800;
+  border-radius: 3rem;
+  cursor: pointer;
+  margin-top: 2rem;
+}
+
+/* Section À Propos */
+.about-section {
+  padding: 5rem 15%;
+  text-align: center;
+}
+
+.about-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Cartes Post-it */
+.steps-container {
+  padding: 4rem 5%;
+  background: white;
+  text-align: center;
+}
+
+.steps-grid {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+  margin-top: 3rem;
+}
+
+.step-card {
+  width: 18rem;
+  padding: 2.5rem;
+  box-shadow: 0.5rem 0.5rem 1.5rem rgba(0,0,0,0.1);
+  border-bottom-right-radius: 4rem 1.5rem;
+  transition: transform 0.3s;
+}
+
+.card-blue { background: #e3f2fd; transform: rotate(-2deg); }
+.card-yellow { background: #fffde7; transform: rotate(1.5deg); }
+.card-green { background: #e8f5e9; transform: rotate(-1deg); }
+
+.step-card:hover {
+  transform: scale(1.05) rotate(0deg);
+}
+
+.step-number {
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+/* Footer */
+.main-footer {
+  background: var(--blue-dark);
+  color: white;
+  padding: 3rem;
+  text-align: center;
+}
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.logo-img {
+  height: 2.5rem; /* Ajuste selon ton image */
+  width: auto;
+  border-radius: 0.5rem; /* Un petit arrondi si c'est une icône carrée */
+}
+
+.logo-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: #1e40af; /* Un bleu qui rappelle ton logo livre */
+  letter-spacing: -0.05rem;
+}

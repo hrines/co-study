@@ -1,0 +1,115 @@
+.todo-content {
+  background: var(--blanc);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  width: 28rem;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 1rem 2rem rgba(0,0,0,0.3);
+}
+
+.todo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+}
+.close-x {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--text-sub);
+  padding: 0;
+}
+
+.close-x:hover {
+  color: var(--text-main);
+}
+.todo-input-section {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 1.2rem;
+}
+
+.todo-input-section input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 0.0625rem solid var(--border-color);
+  border-radius: 0.625rem;
+  font-size: 0.9rem;
+  background: var(--gris-fond);
+  color: var(--text-main);
+  outline: none;
+}
+.todo-input-section button {
+  padding: 0.75rem 1rem;
+  background: var(--vert-clair);
+  color: white;
+  border: none;
+  border-radius: 0.625rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.todo-input-section button:hover {
+  background: var(--vert-fonce);
+}
+.todo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Aligne verticalement la checkbox, le texte et la poubelle */
+    padding: 0.75rem;
+  border-bottom: 0.1rem solid var(--border-color);
+}
+
+.todo-left-side {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem; /* Espace entre la checkbox et le texte */
+    flex: 1;
+}
+
+.todo-checkbox {
+  width: 1.125rem;
+  height: 1.125rem;
+  cursor: pointer;
+  accent-color: var(--vert-clair);
+}
+
+.task-text {
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+/* Style quand c'est coché */
+.todo-item.done .task-text {
+    text-decoration: line-through;
+  color: var(--text-main);
+}
+.todo-item.done span {
+    text-decoration: line-through;
+    color: var(--text-sub);
+}
+
+.todo-item:hover {
+  background: var(--gris-fond);
+}
+
+.delete-btn {
+  background: var(--gris-fond);
+    border: none;
+    cursor: pointer;
+}
+
+
+.todo-header h2 {
+  color: var(--text-main);
+}
+.empty-msg {
+  text-align: center;
+  color: var(--text-sub);
+  padding: 1rem 0;
+  font-size: 0.95rem;
+}

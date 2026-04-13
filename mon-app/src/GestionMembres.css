@@ -1,0 +1,226 @@
+/* --- CONTAINER PRINCIPAL --- */
+.management-container {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    background-color: var(--gris-fond);
+    color: var(--text-main);
+}
+
+/* --- ENTÊTE --- */
+.management-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--bleu-fonce);
+    margin-bottom: 0.5rem;
+}
+
+.management-header p {
+    color: var(--text-sub);
+    max-width: 40rem;
+}
+
+/* --- ACTION BAR (Basée sur l'image) --- */
+.action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+}
+
+.search-box {
+    position: relative;
+    flex-grow: 1;
+    max-width: 20rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 2rem;
+    padding: 0.6rem 1rem;
+    background-color: var(--blanc);
+}
+
+.search-box input {
+    border: none;
+    background: transparent;
+    width: 100%;
+    color: var(--text-main);
+}
+
+.search-box input:focus { outline: none; }
+
+.filter-group {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-filter {
+    background: var(--blanc);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 0.6rem 1rem;
+    border-radius: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+}
+
+.main-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-primary {
+    background-color: var(--bleu-fonce); /* Ou --orange-accent si tu préfères */
+    color: white;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 2rem;
+    font-weight: 700;
+}
+
+.btn-secondary {
+    background-color: var(--blanc);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 0.7rem 1.5rem;
+    border-radius: 2rem;
+}
+
+/* --- TABLEAU (Le gros morceau) --- */
+.table-container {
+    padding: 0; /* Pour que le tableau colle aux bords */
+    overflow-x: auto; /* Scroll horizontal si besoin */
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.user-table th, .user-table td {
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.user-table th {
+    background-color: var(--bleu-fonce);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05rem;
+}
+
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+}
+
+.user-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.email-cell {
+    color: var(--bleu-moyen);
+    font-family: monospace;
+}
+
+/* --- STATUTS BADGES --- */
+.status-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.status-active { background-color: #e6fdf3; color: #12b76a; }
+.status-inactive { background-color: #f2f4f7; color: #667085; }
+.status-banned { background-color: #fef3f2; color: #f04438; }
+.status-pending { background-color: #fff6ed; color: #f97316; }
+.status-suspended { background-color: #fffaeb; color: #f79009; }
+
+/* --- ACTIONS (Icônes) --- */
+.actions-cell {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    padding: 0.3rem;
+    border-radius: 0.4rem;
+    opacity: 0.7;
+}
+
+.icon-btn:hover { opacity: 1; background-color: rgba(0,0,0,0.05); }
+.icon-btn.edit { color: var(--bleu-moyen); }
+.icon-btn.delete { color: #f04438; }
+
+/* --- PAGINATION --- */
+.table-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text-sub);
+}
+
+.rows-per-page select {
+    border: none;
+    background: transparent;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-left: 0.3rem;
+}
+
+.pagination-controls {
+    display: flex;
+    gap: 0.3rem;
+}
+
+.page-btn {
+    background: var(--blanc);
+    border: 1px solid var(--border-color);
+    border-radius: 0.4rem;
+    width: 2.2rem;
+    height: 2.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-sub);
+}
+
+.page-btn.active {
+    background-color: var(--orange-accent); /* Ta couleur Co'study */
+    color: white;
+    border-color: var(--orange-accent);
+}
+
+
+/* Bouton Ajouter et Pagination Active */
+.btn-primary, .page-btn.active {
+    background-color: #F66B0E !important; /* L'orange de ta palette */
+    border-color: #F66B0E !important;
+    color: white;
+}
+
+/* En-tête du tableau */
+.user-table th {
+    background-color: #112B3C; /* Le bleu très foncé de ta palette */
+    color: white;
+}

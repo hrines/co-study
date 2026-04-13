@@ -1,0 +1,116 @@
+.notif-content {
+  background: var(--blanc);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  width: 28rem;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 1rem 2rem rgba(0,0,0,0.3);
+}
+
+.notif-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+}
+
+.notif-header h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.notif-badge {
+  background: #ff4d4d;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.1rem 0.5rem;
+  border-radius: 1rem;
+}
+
+.notif-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-tout-lire {
+  background: none;
+  border: none;
+  color: var(--bleu-fonce);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.btn-tout-lire:hover {
+  text-decoration: underline;
+}
+
+.notif-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.notif-item {
+  padding: 0.75rem 1rem;
+  border-radius: 0.625rem;
+  border: 0.1rem solid var(--border-color);
+  background: var(--gris-fond);
+  transition: var(--transition);
+}
+
+.notif-item.non-lue {
+  background: rgba(26, 35, 126, 0.08);
+  border-color: var(--bleu-fonce);
+}
+
+.notif-message {
+  font-size: 0.9rem;
+  color: var(--text-main);
+  margin-bottom: 0.3rem;
+}
+
+.notif-date {
+  font-size: 0.75rem;
+  color: var(--text-sub);
+  margin-bottom: 0.5rem;
+}
+
+.notif-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.btn-accepter {
+  background: var(--vert-clair);
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-refuser {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-accepter:hover { background: var(--vert-fonce); }
+.btn-refuser:hover { background: #d32f2f; }
