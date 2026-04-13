@@ -40,20 +40,13 @@ function Auth() {
       
       const data = await response.json();
       
-if (response.ok) {
-  // On enregistre l'objet utilisateur complet pour être tranquille plus tard
-  localStorage.setItem('user', JSON.stringify(data.user));
-  
-  // On met à jour les clés individuelles avec le nouveau nom de colonne
-  localStorage.setItem('userName', data.user.prenom);
-  localStorage.setItem('userFiliere', data.user.filiere);
-  
-  // C'EST ICI : On utilise id_etudiant à la place de id
-  localStorage.setItem('userId', data.user.id_etudiant); 
-  
-  navigate('/home');
-}
-else {
+      if (response.ok) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('userName', data.user.prenom);
+        localStorage.setItem('userFiliere', data.user.filiere);
+        localStorage.setItem('userId', data.user.id_etudiant); 
+        navigate('/home');
+      } else {
         setLoginError(data.message || 'Email ou mot de passe incorrect.');
       }
     } catch (err) {
@@ -117,7 +110,6 @@ else {
 
   const { darkMode, toggleDarkMode } = useTheme();
 
-
   return (
     <>
     <div className="auth-header">
@@ -160,7 +152,6 @@ else {
               {loginLoading ? <span className="auth-spinner" /> : 'Se connecter'}
             </button>
           </form>
-          <p className="auth-switch-mobile">Pas encore de compte ? <button onClick={() => setIsLogin(false)}>S'inscrire</button></p>
         </div>
 
         {/* Formulaire SIGNUP */}
@@ -201,25 +192,29 @@ else {
             </div>
             <button type="submit" className="auth-submit" disabled={signupLoading}>{signupLoading ? <span className="auth-spinner" /> : "S'inscrire"}</button>
           </form>
-          <p className="auth-switch-mobile">Déjà un compte ? <button onClick={() => setIsLogin(true)}>Se connecter</button></p>
         </div>
-      </div>
 
-      {/* --- OVERLAY --- */}
-      <div className={`auth-overlay ${isLogin ? 'overlay-right' : 'overlay-left'}`}>
-        <div className="auth-overlay-content">
-          <div className="auth-brand">⚡ <span className="auth-brand-name">Flow</span></div>
-          {isLogin ? (
-            <><h2>Nouveau ici ?</h2><p>Rejoins les groupes d'étude !</p><button className="auth-overlay-btn" onClick={() => setIsLogin(false)}>S'inscrire</button></>
-          ) : (
-            <><h2>Déjà inscrit ?</h2><p>Connecte-toi vite !</p><button className="auth-overlay-btn" onClick={() => setIsLogin(true)}>Se connecter</button></>
-          )}
+        {/* --- OVERLAY --- */}
+        <div className={`auth-overlay ${isLogin ? 'overlay-right' : 'overlay-left'}`}>
+          <div className="auth-overlay-content">
+            <div className="auth-brand">🎓 <span className="auth-brand-name">Co'study</span></div>
+            {isLogin ? (
+              <><h2>Nouveau ici ?</h2><p>Rejoins les groupes d'étude d'Oran 1 !</p><button className="auth-overlay-btn" onClick={() => setIsLogin(false)}>S'inscrire</button></>
+            ) : (
+              <><h2>Déjà inscrit ?</h2><p>Connecte-toi vite à ton espace !</p><button className="auth-overlay-btn" onClick={() => setIsLogin(true)}>Se connecter</button></>
+            )}
+          </div>
+          {/* Formes décoratives */}
+          <div className="auth-left-shapes">
+             <div className="shape shape-1"></div>
+             <div className="shape shape-2"></div>
+             <div className="shape shape-3"></div>
+          </div>
         </div>
       </div>
     </div>
   </>
-    );
-
+  );
 }
 
 export default Auth;

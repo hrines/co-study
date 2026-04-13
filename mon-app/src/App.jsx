@@ -10,6 +10,7 @@ import Biblio from './biblio';
 import AdminSy from './adminsy';
 import LandingPage from './LandingPage';
 
+
 function App() {
   return (
     <Router>
@@ -36,7 +37,6 @@ function App() {
         {/* Redirection par défaut : si l'URL ne correspond à rien, on va au login */}
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="*" element={<Authentification />} />
-
 
 
 

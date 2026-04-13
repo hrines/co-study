@@ -1,153 +1,433 @@
-/* Variables de couleurs basées sur tes captures */
-:root {
-  --blue-dark: #0f172a;
-  --blue-flow: #38bdf8;
-  --orange-action: #f97316;
-  --bg-light: #f8fafc;
+/* --- REGLES GLOBAUX --- */
+.landing-wrapper-v2 {
+  min-height: 100vh;
+  background-color: var(--gris-fond); /* Le gris clair */
+  color: var(--text-main);
+  overflow-x: hidden;
 }
 
-.landing-wrapper {
-  background-color: var(--bg-light);
-  color: var(--blue-dark);
-  font-family: 'Inter', sans-serif;
+* {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; /* Police moderne pour Co'study */
 }
 
-/* Nav style FIED */
-.main-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 5%;
-  background: white;
-  height: 10vh;
-  position: sticky;
+/* --- BARRE DE PROGRESSION HORIZONTALE --- */
+.scroll-progress-container {
+  position: fixed;
+  top: 5rem; /* Doit être égal à la hauteur (height) de .modern-nav */
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: var(--border-color);
+  z-index: 2001; /* Un cran au-dessus du nav pour être bien visible */
+}
+
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%; /* Commence à 0%, GSAP gère la suite */
+  background-color: var(--orange-accent); /* Ta couleur orange vif */
+  border-radius: 0 4px 4px 0;
+}
+/* --- NAVIGATION FIXE --- */
+.modern-nav {
+  position: fixed; /* Changé de absolute à fixed */
   top: 0;
-  z-index: 100;
-  box-shadow: 0 0.2rem 1rem rgba(0,0,0,0.05);
+  left: 0;
+  width: 100%;
+  height: 5rem;
+  z-index: 2000; /* Augmenté pour passer au-dessus de la barre de progression et des post-it */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8%;
+  
+  /* Ajout d'un léger fond flouté pour que le texte reste lisible au scroll */
+  background-color: rgba(239, 239, 239, 0.85); /* Ton gris-fond avec transparence */
+  backdrop-filter: blur(10px); /* Effet moderne de flou derrière la barre */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
+.logo-section { display: flex; align-items: center; gap: 0.8rem; }
+.nav-logo { height: 2.2rem; }
+.logo-text { font-weight: 800; font-size: 1.6rem; color: var(--bleu-fonce); letter-spacing: -1.5px; }
 
 .nav-links a {
   text-decoration: none;
-  color: var(--blue-dark);
+  color: var(--bleu-moyen);
   margin: 0 1.5rem;
-  font-weight: 600;
-  font-size: 1.1rem;
+  font-weight: 500;
+  transition: opacity 0.3s;
 }
 
-.auth-btn {
-  background-color: #bee3f8;
-  color: #2c5282;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 2rem;
+.nav-links a:hover, .nav-links a.active {
+  opacity: 1;
+  color: var(--bleu-fonce);
   font-weight: 700;
-  cursor: pointer;
 }
 
-/* Hero Section */
-.hero-section {
-  height: 70vh;
-  background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)), 
-              url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1000&q=80'); /* Image d'étude générique */
-  background-size: cover;
-  background-position: center;
+/* --- HERO SECTION MODERNE (Full Screen) --- */
+.hero-modern {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-split {
+  max-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 5%;
+  padding: 0 5%;
+}
+
+/* Colonne GAUCHE (Flèche) */
+.visual-column { flex: 1.2; }
+
+.arrow-shape {
+  width: 100%;
+  height: 550px;
+  background: linear-gradient(135deg, var(--bleu-moyen), #1e3a8a); /* Tes bleus du :root */
+  border-radius: 2rem;
+  /* Forme de flèche pointant vers le texte */
+  clip-path: polygon(0% 0%, 85% 0%, 100% 50%, 85% 100%, 0% 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-placeholder {
+  font-size: 12rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.1); /* "C" Géant et transparent */
+}
+
+/* Colonne DROITE (Texte) */
+.text-column { flex: 1; }
+
+.main-title {
+  font-size: 4rem;
+  font-weight: 900;
+  line-height: 1.05;
+  color: var(--text-main); /* Ton bleu foncé */
+  margin-bottom: 2rem;
+  letter-spacing: -2px;
+}
+
+.main-title span { color: var(--bleu-moyen); }
+
+.hero-description {
+  font-size: 1.25rem;
+  color: var(--text-sub);
+  line-height: 1.7;
+  max-width: 90%;
+  opacity: 0.9;
+}
+
+/* On change le Hero pour le split. On n'utilise pas ici les boutons "Flow" */
+/* J'ai mis à jour les boutons directement dans le :root */
+
+
+
+
+
+
+
+
+/* --- SECTION À PROPOS (Style Thynk) --- */
+.about-modern-section {
+  padding: 100px 8%;
+  background-color: var(--gris-fond);
   display: flex;
   justify-content: center;
-  align-items: center;
-  color: white;
+  min-height: 80vh;
+}
+
+.about-frame {
+  width: 100%;
+  max-width: 1100px;
+  border: 1px solid var(--border-color); /* Cadre fin comme ton image */
+  border-radius: 40px;
+  padding: 80px 40px;
+  position: relative;
+  background: var(--blanc);
   text-align: center;
 }
 
-.hero-section h1 {
-  font-size: clamp(2rem, 8vw, 4rem);
-  margin-bottom: 1rem;
+/* Les bulles bleues flottantes */
+.dot {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  background-color: #004cff; /* Le bleu vif de ton image Thynk */
+  border-radius: 50%;
+  z-index: 1;
 }
 
-.cta-orange {
-  background-color: var(--orange-action);
+.dot-top {
+  top: -40px;
+  right: -30px;
+}
+
+.dot-bottom {
+  bottom: 80px;
+  left: -40px;
+}
+
+.frame-content {
+  position: relative;
+  z-index: 2; /* Pour passer par-dessus les bulles */
+}
+
+.frame-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: var(--bleu-fonce);
+  margin-bottom: 2rem;
+}
+
+.frame-title span {
+  display: block;
+  font-weight: 400;
+}
+
+.frame-description {
+  font-size: 1.2rem;
+  color: var(--text-sub);
+  max-width: 700px;
+  margin: 0 auto 3rem auto;
+  line-height: 1.6;
+}
+
+.btn-know-more {
+  background-color: #004cff;
   color: white;
   border: none;
-  padding: 1.2rem 2.5rem;
-  font-size: 1.2rem;
-  font-weight: 800;
-  border-radius: 3rem;
+  padding: 15px 35px;
+  border-radius: 50px;
+  font-weight: 700;
   cursor: pointer;
-  margin-top: 2rem;
+  transition: transform 0.2s;
 }
 
-/* Section À Propos */
-.about-section {
-  padding: 5rem 15%;
-  text-align: center;
+.btn-know-more:hover {
+  transform: scale(1.05);
 }
 
-.about-section h2 {
-  font-size: 2.5rem;
-  margin-bottom: 1.5rem;
-}
 
-/* Cartes Post-it */
+
+
+/* --- SECTION ÉTAPES (POST-IT) --- */
 .steps-container {
-  padding: 4rem 5%;
-  background: white;
+  padding: 80px 8%;
   text-align: center;
+  background-color: var(--gris-fond);
+}
+
+.steps-container h2 {
+  font-size: 2.5rem;
+  margin-bottom: 50px;
+  color: var(--bleu-fonce);
+  font-weight: 800;
 }
 
 .steps-grid {
   display: flex;
   justify-content: center;
-  gap: 3rem;
+  gap: 30px;
   flex-wrap: wrap;
-  margin-top: 3rem;
 }
 
 .step-card {
-  width: 18rem;
-  padding: 2.5rem;
-  box-shadow: 0.5rem 0.5rem 1.5rem rgba(0,0,0,0.1);
-  border-bottom-right-radius: 4rem 1.5rem;
-  transition: transform 0.3s;
+  width: 300px;
+  padding: 40px 30px;
+  border-radius: 5px; /* Coins légèrement arrondis comme un post-it */
+  box-shadow: 10px 10px 20px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+  position: relative;
 }
-
-.card-blue { background: #e3f2fd; transform: rotate(-2deg); }
-.card-yellow { background: #fffde7; transform: rotate(1.5deg); }
-.card-green { background: #e8f5e9; transform: rotate(-1deg); }
 
 .step-card:hover {
-  transform: scale(1.05) rotate(0deg);
+  transform: translateY(-10px) rotate(2deg);
 }
+
+/* Couleurs des Post-it basées sur ton image */
+.card-blue { background-color: #D1E9F6; border-bottom: 5px solid #3498db; }
+.card-yellow { background-color: #FFF9C4; border-bottom: 5px solid #f1c40f; }
+.card-green { background-color: #DCEDC8; border-bottom: 5px solid #2ecc71; }
 
 .step-number {
-  font-weight: 800;
-  text-transform: uppercase;
-  font-size: 0.9rem;
   display: block;
-  margin-bottom: 1rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  color: rgba(0,0,0,0.5);
 }
 
-/* Footer */
-.main-footer {
-  background: var(--blue-dark);
-  color: white;
-  padding: 3rem;
-  text-align: center;
-}
-.logo-container {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-}
-
-.logo-img {
-  height: 2.5rem; /* Ajuste selon ton image */
-  width: auto;
-  border-radius: 0.5rem; /* Un petit arrondi si c'est une icône carrée */
-}
-
-.logo-text {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-weight: 800;
+.step-card h3 {
   font-size: 1.5rem;
-  color: #1e40af; /* Un bleu qui rappelle ton logo livre */
-  letter-spacing: -0.05rem;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.step-card p {
+  color: #666;
+  line-height: 1.5;
+}
+/* --- STYLE DE BASE DES POST-IT --- */
+.step-card {
+  width: 300px;
+  padding: 40px 30px;
+  border-radius: 2px; /* Coins plus vifs pour l'effet papier */
+  box-shadow: 5px 5px 15px rgba(0,0,0,0.1); /* Ombre légère au repos */
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animation fluide */
+  position: relative;
+}
+
+/* --- L'EFFET HOVER (SURVOL) --- */
+.step-card:hover {
+  transform: translateY(-15px) rotate(3deg) scale(1.05); /* Se soulève, tourne et grandit */
+  box-shadow: 15px 20px 30px rgba(0,0,0,0.15); /* Ombre portée plus profonde */
+  z-index: 10; /* Passe au-dessus des autres */
+}
+
+/* Couleurs avec une petite bordure en bas pour le relief */
+.card-blue { 
+  background-color: #D1E9F6; 
+  border-bottom: 8px solid rgba(52, 152, 219, 0.3); 
+}
+.card-yellow { 
+  background-color: #FFF9C4; 
+  border-bottom: 8px solid rgba(241, 196, 15, 0.3); 
+}
+.card-green { 
+  background-color: #DCEDC8; 
+  border-bottom: 8px solid rgba(46, 204, 113, 0.3); 
+}
+
+/* Optionnel : Un petit effet de "pli" sur le coin en bas à droite */
+.step-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  border-width: 0 0 20px 20px;
+  border-style: solid;
+  border-color: transparent transparent var(--gris-fond) transparent;
+  transition: all 0.4s ease;
+}
+
+.step-card:hover::after {
+  border-width: 0 0 30px 30px; /* Le pli s'agrandit au survol */
+}
+
+
+/* --- SECTION ACTION SOUS LES POST-IT --- */
+.steps-action {
+  margin-top: 60px; /* Espace avec les post-it */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+/* On réutilise ta classe orange mais en plus grand */
+.big-cta {
+  padding: 18px 45px !important; /* Plus imposant */
+  font-size: 1.2rem !important;
+  box-shadow: 0 10px 20px rgba(246, 107, 14, 0.2); /* Petite lueur orange */
+  transition: all 0.3s ease;
+}
+
+.big-cta:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 30px rgba(246, 107, 14, 0.4);
+}
+
+.sub-text {
+  font-size: 0.9rem;
+  color: var(--text-sub);
+  font-style: italic;
+  opacity: 0.8;
+}
+
+
+
+/* --- FOOTER STYLE --- */
+.main-footer {
+  background-color: var(--bleu-fonce); /* #112B3C */
+  color: #ffffff;
+  padding: 80px 8% 20px 8%;
+  margin-top: 100px;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr; /* La colonne marque est plus large */
+  gap: 50px;
+  padding-bottom: 50px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-column h3 {
+  color: var(--orange-accent); /* #F66B0E */
+  font-size: 1.4rem;
+  margin-bottom: 25px;
+  font-weight: 700;
+}
+
+.footer-desc {
+  line-height: 1.7;
+  opacity: 0.8;
+  margin-top: 15px;
+  max-width: 350px;
+}
+
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-column ul li {
+  margin-bottom: 12px;
+}
+
+.footer-column ul li a {
+  color: #ffffff;
+  text-decoration: none;
+  opacity: 0.7;
+  transition: 0.3s;
+}
+
+.footer-column ul li a:hover {
+  opacity: 1;
+  color: var(--orange-accent);
+  padding-left: 5px;
+}
+
+.social-links {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+  font-size: 1.5rem;
+}
+
+/* Bande de copyright en bas */
+.footer-bottom {
+  text-align: center;
+  padding-top: 30px;
+  font-size: 0.9rem;
+  opacity: 0.5;
+}
+
+/* Adaptation pour mobile */
+@media (max-width: 768px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .footer-desc {
+    margin: 15px auto;
+  }
 }
