@@ -150,7 +150,7 @@ const LandingPage = () => {
               La plateforme collaborative dédiée aux étudiants de l'Université d'Oran 1. 
               Simplifiez votre réussite, ensemble.
             </p>
-            <div className="social-links">
+          <div className="social-links">
               <i className="fab fa-facebook"></i>
               <i className="fab fa-twitter"></i>
             </div>

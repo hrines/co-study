@@ -3,6 +3,8 @@ const cors = require('cors');
 const mysql = require('mysql2');
 const http = require('http');
 const { Server } = require('socket.io');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const multer = require('multer');
 const path = require('path');
@@ -55,28 +57,83 @@ db.connect((err) => {
 });
 
 // --- 1. ROUTES D'AUTHENTIFICATION ---
-app.post('/api/signup', (req, res) => { 
+app.post('/api/signup', async (req, res) => { // 'async' est indispensable ici
     const { email, nom, prenom, matricule, mot_de_passe, filiere } = req.body;
-    const sql = "INSERT INTO etudiants (email, nom, prenom, matricule, mot_de_passe, filiere) VALUES (?, ?, ?, ?, ?, ?)";
-    db.query(sql, [email, nom, prenom, matricule, mot_de_passe, filiere], (err, result) => {
-        if (err) return res.status(500).send({ message: "Erreur: " + err.message });
-        res.status(200).send({ message: "Succès" });
-    });
+    
+    try {
+        const saltRounds = 10;
+        // On hache le mot de passe avant de l'envoyer à la BDD
+        const hashedPassword = await bcrypt.hash(mot_de_passe, saltRounds);
+
+        const sql = "INSERT INTO etudiants (email, nom, prenom, matricule, mot_de_passe, filiere) VALUES (?, ?, ?, ?, ?, ?)";
+        
+        // On remplace 'mot_de_passe' par 'hashedPassword'
+        db.query(sql, [email, nom, prenom, matricule, hashedPassword, filiere], (err, result) => {
+            if (err) return res.status(500).send({ message: "Erreur: " + err.message });
+            res.status(200).send({ message: "Succès" });
+        });
+    } catch (error) {
+        res.status(500).send({ message: "Erreur lors de la sécurisation du mot de passe" });
+    }
 });
 
 app.post('/api/login', (req, res) => {
     const { email, mot_de_passe } = req.body;
-const sql = "SELECT id_etudiant, email, prenom, filiere FROM etudiants WHERE email = ? AND mot_de_passe = ?";    db.query(sql, [email, mot_de_passe], (err, result) => {
+    
+    // On cherche l'utilisateur par son email seulement
+    const sql = "SELECT * FROM etudiants WHERE email = ?"; 
+    
+    db.query(sql, [email], async (err, result) => {
         if (err) return res.status(500).send({ message: "Erreur serveur" });
+        
         if (result.length > 0) {
-            res.status(200).send({ message: "Connexion réussie !", user: result[0] });
+            const user = result[0];
+            console.log("MDP saisi:", mot_de_passe);
+            console.log("Hash en BDD:", user.mot_de_passe);
+            
+            // On compare le mot de passe saisi avec le hash stocké dans la BDD
+            const match = await bcrypt.compare(mot_de_passe, user.mot_de_passe);            
+if (match) {
+                // On crée le token qui contient l'ID de l'étudiant
+                // 'ma_cle_secrete_123' est la signature de ton serveur (garde-la bien !)
+                const token = jwt.sign(
+                    { id: user.id_etudiant, email: user.email }, 
+                    'ma_cle_secrete_123', 
+                    { expiresIn: '24h' } // Le ticket expire après 1 jour
+                );
+
+                delete user.mot_de_passe; // Sécurité habituelle
+
+                // On envoie le user ET le token au React
+                res.status(200).send({ 
+                    message: "Connexion réussie !", 
+                    user: user,
+                    token: token 
+                });
+            } else {
+                res.status(401).send({ message: "Email ou mot de passe incorrect" });
+            }
         } else {
             res.status(401).send({ message: "Email ou mot de passe incorrect" });
         }
     });
 });
 
+const verifyToken = (req, res, next) => {
+    const token = req.headers['authorization']?.split(' ')[1]; // On récupère le token du Header
 
+    if (!token) {
+        return res.status(403).send({ message: "Token manquant, accès refusé !" });
+    }
+
+    jwt.verify(token, 'ma_cle_secrete_123', (err, decoded) => {
+        if (err) {
+            return res.status(401).send({ message: "Token invalide ou expiré !" });
+        }
+        req.userId = decoded.id; // On stocke l'ID pour l'utiliser dans la route si besoin
+        next(); // Tout est bon, on passe à la suite
+    });
+};
 // Remplace ta route app.post('/api/upload', ...) par celle-ci :
 app.post('/api/upload', upload.single('fichier'), (req, res) => {
     // On vérifie si le fichier est arrivé
@@ -153,8 +210,8 @@ app.get('/api/favoris/:id_etudiant', (req, res) => {
 });
 
 // --- 2. GESTION DES GROUPES ---
-app.post('/api/create-group', (req, res) => {
-  const { nom_groupe, description, filiere, type_cursus, niveau, id_etudiant} = req.body;
+app.post('/api/create-group', verifyToken, (req, res) => {
+    const { nom_groupe, description, filiere, type_cursus, niveau, id_etudiant} = req.body;
     const sql = "INSERT INTO groupes (nom_groupe, description, filiere, type_cursus, niveau, id_etudiant) VALUES (?, ?, ?, ?, ?, ?)";
   
   db.query(sql, [nom_groupe, description, filiere, type_cursus, niveau, id_etudiant], (err, result) => {

@@ -99,10 +99,19 @@ useEffect(() => {
 useEffect(() => {
   if (!userId) return;
 
-  
-  fetch(`http://localhost:5000/api/notifications/${userId}`)
+  const token = localStorage.getItem('token'); // On récupère le badge
+
+  fetch(`http://localhost:5000/api/notifications/${userId}`, {
+    headers: {
+      'Authorization': `Bearer ${token}` // On l'envoie au serveur
+    }
+  })
     .then(res => res.json())
-    .then(data => setNbNotifs(data.filter(n => n.lu === 0).length))
+    .then(data => {
+      if (Array.isArray(data)) {
+        setNbNotifs(data.filter(n => n.lu === 0).length);
+      }
+    })
     .catch(err => console.error(err));
 }, [userId]);
 
@@ -114,21 +123,28 @@ useEffect(() => {
 
 // Charger TOUS les groupes (Créés + Rejoints)
 useEffect(() => {
-  fetch(`http://localhost:5000/api/mes-groupes/${userId}`)
+  if (!userId) return;
+
+  const token = localStorage.getItem('token');
+
+  fetch(`http://localhost:5000/api/mes-groupes/${userId}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
     .then(res => res.json())
     .then(data => setMesGroupes(data))
     .catch(err => console.error(err));
-
 }, [userId]);
 
 const { darkMode, toggleDarkMode } = useTheme();
 const [isNotifOpen, setIsNotifOpen] = useState(false);
 
 
-    const handleLogout = () => {
-    localStorage.removeItem("userName");
+const handleLogout = () => {
+    localStorage.clear(); // Ça enlève userName, userId ET le token d'un coup
     navigate('/auth');
-  };
+};
 
 
 

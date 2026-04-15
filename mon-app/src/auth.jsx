@@ -27,7 +27,7 @@ function Auth() {
   const [signupSuccess, setSignupSuccess] = useState('');
 
   // --- Handlers ---
-  const handleLogin = async (e) => {
+const handleLogin = async (e) => {
     e.preventDefault();
     setLoginLoading(true);
     setLoginError('');
@@ -41,10 +41,15 @@ function Auth() {
       const data = await response.json();
       
       if (response.ok) {
-        localStorage.setItem('user', JSON.stringify(data.user));
+        // --- LES 2 LIGNES CLÉS POUR LE JWT ---
+        localStorage.setItem('token', data.token); // On stocke le ticket de sécurité
+        localStorage.setItem('user', JSON.stringify(data.user)); // On stocke les infos utilisateur
+        
+        // Tes autres stockages (optionnels si tu utilises déjà l'objet 'user')
         localStorage.setItem('userName', data.user.prenom);
         localStorage.setItem('userFiliere', data.user.filiere);
         localStorage.setItem('userId', data.user.id_etudiant); 
+        
         navigate('/home');
       } else {
         setLoginError(data.message || 'Email ou mot de passe incorrect.');
@@ -56,7 +61,6 @@ function Auth() {
       setLoginLoading(false);
     }
   };
-
   const handleSignup = async (e) => {
     e.preventDefault();
     setSignupLoading(true);
