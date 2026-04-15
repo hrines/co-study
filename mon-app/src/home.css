@@ -16,14 +16,8 @@
   --transition: all 0.3s ease;
 }
 
-body.dark {
-  --gris-fond: #0a141d;
-  --blanc: #112B3C;
-  --text-main: #ffffff;
-  --border-color: #205375;
-  --bleu-fonce: #070d14;
-  --text-sub: #94a3b8;
-}* {
+
+* {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -47,8 +41,8 @@ body {
 .sidebar {
   width: 20%;
   min-width: 15rem;
-  background-color: var(--bleu-fonce);
-  color: white;
+  background-color: var(--bleu-fonce); /* Utilise la variable ! */
+  color: #fefefe;             /* Évite "white" en dur */
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
@@ -188,6 +182,9 @@ body {
   align-items: center;
   justify-content: center;
 }
+.nav-item .text {
+  color: inherit; /* Pour que le texte suive la couleur de la sidebar */
+}
 .nav-item:hover {
   background-color: rgba(255, 255, 255, 0.1);
   padding-left: 1.2rem;
@@ -257,13 +254,13 @@ body {
 }
 
 .pomo-btn.play {
-  background: var(--vert-clair);
-  color: white;
+  background: var(--bleu-moyen);
+  color: var(--orange-accent);
 }
 
 .pomo-btn.reset {
-  background: var(--border-color);
-  color: var(--text-main);
+  background: var(--bleu-moyen);
+  color: var(--orange-accent);
 }
 
 .pomodoro-cycles {
@@ -292,8 +289,7 @@ body {
   border-color: var(--bleu-fonce);
 }
 .logout-btn {
-  background-color: #ff4d4d;
-  color: white;
+  background-color: var(--orange-accent);
   border: none;
   padding: 0.8rem;
   border-radius: 0.5rem;
@@ -304,7 +300,7 @@ body {
 }
 
 .logout-btn:hover {
-  background-color: #d32f2f;
+  background-color: var(--orange-accent);
 }
 
 /* --- 4. WRAPPER DROIT (NAVBAR + CONTENU) --- */
@@ -365,6 +361,7 @@ body {
   width: 100%;
   max-width: 45rem; /* Largeur de la barre */
   margin-top: 1rem;
+  margin: 0 auto; /* Centrage horizontal */
 }
 
 .hero-search-bar {
@@ -387,6 +384,49 @@ body {
   cursor: pointer;
 }
 
+/* La boîte qui contient les résultats */
+.search-dropdown-results {
+  position: absolute;
+  top: 105%; 
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  z-index: 1000;
+  max-height: 350px;
+  overflow-y: auto;
+  border: 1px solid rgba(0,0,0,0.05);
+  padding: 8px 0;
+}
+
+.search-item-row {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #2c3e50;
+}
+
+.search-item-row:hover {
+  background-color: #f8faff;
+  padding-left: 25px; /* Petit effet de décalage au survol */
+}
+
+.type-icon {
+  background: #eef2f7;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+}
+
+.result-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
 .actions-section {
   display: flex;
   align-items: center;
@@ -394,7 +434,7 @@ body {
 }
 
 .btn-create {
-  background-color: var(--vert-clair);
+  background-color: var(--orange-accent);
   color: white;
   border: none;
   padding: 0.6rem 1.2rem;
@@ -405,7 +445,7 @@ body {
 }
 
 .btn-create:hover {
-  background-color: var(--vert-fonce);
+  filter: brightness(1.2);             /* Éclaircit l'orange au lieu de changer de couleur */
   transform: translateY(-0.1rem);
 }
 
@@ -457,22 +497,20 @@ margin: 1rem 0;
 
 }
 .mes-groupes span {
-color: var(--text-sub); 
-font-size: 1.4rem;
-padding: 0.5rem 0;
-
+  color: var(--text-main);             /* Sera blanc en dark, bleu en light */
+  font-size: 1.4rem;
+  padding: 0.5rem 0;
 }
 
 .w33 {
   width: 28rem;
-  background-color: #333a8f1b;
+  background-color: var(--blanc);      /* Utilise ta variable de carte */
+  border: 1px solid var(--border-color);
   border-radius: 0.625rem;
-  text-align: center;
+  padding: 1.5rem;
   transition: transform 0.3s ease;
-  box-shadow: 0 0.3125rem 0.9375rem #1a227e65;
+  box-shadow: var(--shadow);           /* Utilise ton ombre variable */
   margin: 0.625rem;
-  flex-direction: row;
-  text-align: left;
 }
 
 .w33:hover {
@@ -480,5 +518,8 @@ padding: 0.5rem 0;
   box-shadow: 0 0.625rem 1.25rem #1a227e99;
 }
 
+.dark-mode-btn {
+  background-color: #546e7a;
+}
 
 

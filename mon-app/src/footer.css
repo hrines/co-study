@@ -1,0 +1,86 @@
+.main-footer {
+  background-color: var(--bleu-fonce); /* #112B3C - Ton pétrole foncé de Freepik */
+  color: #ffffff; /* On reste sur du blanc pour le contraste sur fond sombre */
+  padding: 80px 8% 20px 8%;
+  margin-top: 100px;
+  border-top: 4px solid var(--orange-accent); /* Une petite ligne orange en haut pour le rappel de marque */
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 50px;
+  padding-bottom: 50px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-column h3 {
+  color: var(--orange-accent); /* #F66B0E - Ton orange Freepik */
+  font-size: 1.4rem;
+  margin-bottom: 25px;
+  font-weight: 700;
+}
+
+.logo-text {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.footer-desc {
+  line-height: 1.7;
+  opacity: 0.8;
+  margin-top: 15px;
+  max-width: 350px;
+  font-size: 0.95rem;
+}
+
+/* On s'assure que les icônes de ta liste (si tu en as) sont aussi blanches */
+.footer-column ul li a {
+  color: #ffffff;
+  text-decoration: none;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+  display: inline-block; /* Pour que le padding-left fonctionne bien */
+}
+
+.footer-column ul li a:hover {
+  opacity: 1;
+  color: var(--orange-accent);
+  transform: translateX(5px); /* Plus fluide que padding-left */
+}
+
+.social-links i {
+  color: #ffffff;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.social-links i:hover {
+  color: var(--orange-accent);
+  transform: translateY(-3px);
+}
+
+.footer-bottom {
+  text-align: center;
+  padding-top: 30px;
+  font-size: 0.9rem;
+  opacity: 0.5;
+  color: #ffffff;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 40px;
+  }
+  .footer-desc {
+    margin: 15px auto;
+  }
+  .social-links {
+    justify-content: center;
+  }
+}

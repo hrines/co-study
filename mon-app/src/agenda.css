@@ -1,0 +1,145 @@
+.agenda-container {
+    display: flex;
+    background: #fff;
+    width: 95%;
+    max-width: 850px;
+    height: 500px;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+/* Colonne Gauche */
+.calendar-sidebar {
+    flex: 1.2;
+    padding: 2rem;
+    background: #fdfdfd;
+    border-right: 1px solid #eee;
+}
+
+.calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.weekdays-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 0.8rem;
+    color: #999;
+    margin-bottom: 1rem;
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.day-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    position: relative;
+    transition: 0.2s;
+}
+
+.day-cell:hover { background: #f0f0f0; }
+.day-cell.selected { background: #F66B0E; color: white; font-weight: bold; }
+.day-cell.today { border: 2px solid #205375; }
+
+.event-dot {
+    width: 4px;
+    height: 4px;
+    background: #F66B0E;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 5px;
+}
+
+/* Colonne Droite */
+.events-panel {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-header h3 { text-transform: capitalize; color: #205375; }
+
+.quick-add-form {
+    display: flex;
+    gap: 10px;
+    margin: 1.5rem 0;
+}
+
+.quick-add-form input {
+    padding: 8px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+.quick-add-form button {
+    background: #205375;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 35px;
+    cursor: pointer;
+}
+
+.event-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-left: 4px solid #F66B0E;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.event-time { font-weight: bold; font-size: 0.85rem; color: #205375; }
+
+
+.event-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-left: 4px solid #F66B0E;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    position: relative; /* Pour positionner le bouton */
+}
+
+.btn-delete-event {
+    margin-left: auto; /* Pousse le bouton vers la droite */
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 5px;
+    transition: transform 0.2s, opacity 0.2s;
+    opacity: 0.6;
+}
+
+.btn-delete-event:hover {
+    transform: scale(1.2);
+    opacity: 1;
+}
+
+/* Optionnel : rendre le titre un peu plus compact pour laisser de la place */
+.event-title {
+    flex: 1;
+    font-size: 0.95rem;
+    color: #333;
+}

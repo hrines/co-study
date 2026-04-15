@@ -28,31 +28,30 @@ const GestionGroupes = ({ filiere, niveau }) => {
   }, [view, filiere, niveau]);
 
 const handleAction = async (id, action) => {
-    const confirmMsg = action === 'valider' ? "Approuver ce groupe ?" : "Supprimer ce groupe ?";
-    if (!window.confirm(confirmMsg)) return;
+  const confirmMsg = action === 'valider' ? "Approuver ce groupe ?" : "Supprimer ce groupe ?";
+  if (!window.confirm(confirmMsg)) return;
 
-    try {
-      const token = localStorage.getItem('token');
-      // On définit dynamiquement la méthode : PUT pour valider, DELETE pour refuser
-      const method = action === 'valider' ? 'put' : 'delete'; 
-      const url = action === 'valider' 
-        ? `http://localhost:5000/api/admin/valider-groupe/${id}`
-        : `http://localhost:5000/api/admin/refuser-groupe/${id}`;
+  try {
+    const token = localStorage.getItem('token');
+    const method = action === 'valider' ? 'put' : 'delete';
+    const url = action === 'valider' 
+      ? `http://localhost:5000/api/admin/valider-groupe/${id}`
+      : `http://localhost:5000/api/admin/refuser-groupe/${id}`;
 
-      await axios({
-        method: method, // <-- Utilise la variable 'method' ici au lieu de 'put' en dur
-        url: url,
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+    // ✅ CORRECTION : method (variable) au lieu de 'put' (string fixe)
+    await axios({
+      method: method,
+      url: url,
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
 
-      // Mise à jour de l'interface : on retire le groupe traité de la liste
-      setGroupes(groupes.filter(g => (g.id_groupe || g.id) !== id));
-      alert(action === 'valider' ? "Groupe activé !" : "Action effectuée.");
-    } catch (error) {
-      console.error("Erreur action admin:", error);
-      alert("Erreur lors de l'opération");
-    }
-  };
+    setGroupes(groupes.filter(g => (g.id_groupe || g.id) !== id));
+    alert(action === 'valider' ? "Groupe activé !" : "Action effectuée.");
+  } catch (error) {
+    console.error("Erreur action admin:", error);
+    alert("Erreur lors de l'opération");
+  }
+};
 
   if (loading) return <div className="loading-state">Chargement des groupes...</div>;
 

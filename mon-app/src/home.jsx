@@ -1,21 +1,26 @@
 
-
+import { useTheme } from './ThemeContext'; 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './home.css';
+
+// Tes composants
 import CreateGroup from './CreateGroup';
 import TodoModal from './TodoModal';
-import { useTheme } from './ThemeContext';
 import NotifModal from './NotifModal';
-
+import Agenda from './agenda';
 
 
 
 
 const Home = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
   const navigate = useNavigate();  
   const nomClient = localStorage.getItem("userName");
   const userId = localStorage.getItem('userId');
+  // Dans Home.jsx, plus tard
+const avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${nomClient || 'Guest'}&backgroundColor=205375`;
 
   const [isCollapsed, setIsCollapsed] = useState(false);  // État pour gérer si le menu est réduit ou pas
   const toggleSidebar = () => { setIsCollapsed(!isCollapsed);};  // Fonction pour inverser l'état du menu
@@ -24,6 +29,7 @@ const Home = () => {
   const [isGroupeOpen, setIsGroupeOpen] = useState(false); // Menu principal "Groupes"
   const [selectedSystem, setSelectedSystem] = useState(null); // "LMD" ou "Ingenieur"
 
+  const [isAgendaOpen, setIsAgendaOpen] = useState(false);
   const levels = {
      LMD: ['L1', 'L2', 'L3', 'M1', 'M2'],
      Ingenieur: ['1ere', '2eme', '3eme', '4eme', '5eme']
@@ -79,7 +85,7 @@ useEffect(() => {
     }, 1000);
   } else if (timeLeft === 0) {
     clearInterval(interval);
-    playBeep();
+    /*playBeep();*/ // Sonnerie à la fin du timer (optionnel)
     if (mode === 'work') {
       setMode('break');
       setTimeLeft(5 * 60);
@@ -150,7 +156,7 @@ const handleLogout = () => {
 
 
 
-
+console.log("État actuel - Terme:", searchTerm, "Résultats:", searchResults);
   return (
     <div className={`dashboard-layout ${isCollapsed ? 'collapsed' : ''}`}>
 {/* 1. BARRE LATÉRALE (SIDEBAR) */}
@@ -180,18 +186,14 @@ const handleLogout = () => {
 <div className="nav-item" onClick={() => navigate('/adminsy')} title="Interface Admin">             <span className="icon">🛠️</span>
              {!isCollapsed && <span className="text">Interface Admin</span>}
            </div>
-           <div className="nav-item" onClick={() => navigate('/agenda')} title="Agenda">
-             <span className="icon">📅</span>
-             {!isCollapsed && <span className="text">Agenda</span>}
-           </div>
 
           <div className="nav-item" onClick={() => navigate('/biblio')} title="Bibliothèque de fichiers">
              <span className="icon">📚</span>
              {!isCollapsed && <span className="text">Bibliothèque</span>}
           </div>
-          <div className="nav-item" onClick={() => navigate('/agenda')} title="agenda">
+          <div className="nav-item" onClick={() => setIsAgendaOpen(true)} title="agenda">
             <span className="icon">📅</span>
-            {!isCollapsed && <span className="text">agenda</span>}
+            {!isCollapsed && <span className="text">Agenda</span>}
           </div>
           <div className="nav-item" onClick={() => setIsTodoOpen(true)} title="To-Do List">
             <span className="icon">✅</span>
@@ -304,7 +306,7 @@ const handleLogout = () => {
 >
   + Créer un Groupe
 </button>   
-      { /* Dans ton bouton dark mode */}
+      {/* Dans ton bouton dark mode */}
             <button className="dark-mode-btn" onClick={toggleDarkMode}>
               {darkMode ? '☀️' : '🌙'}
             </button>            <div className="user-profile">
@@ -320,14 +322,66 @@ const handleLogout = () => {
       <h1>Apprenons ensemble</h1>
       <p>Trouve les meilleurs groupes et documents pour ton cursus.</p>
       
-      <div className="search-container-hero">
-        <input 
-          type="text" 
-          placeholder="Recherche de groupes ou de documents..." 
-          className="hero-search-bar" 
-        />
-        <button className="hero-search-btn">🔍</button>
+<div className="search-container-hero">
+  <input 
+    type="text" 
+    placeholder="Recherche de groupes ou de documents..." 
+    className="hero-search-bar" 
+    value={searchTerm} // N'oublie pas de déclarer const [searchTerm, setSearchTerm] = useState(""); en haut
+onChange={(e) => {
+  const val = e.target.value;
+  setSearchTerm(val);
+  
+  if (val.length > 0) {
+    console.log("Tentative de fetch pour :", val);
+    
+    fetch(`http://localhost:5000/api/search-all?q=${encodeURIComponent(val)}`)
+      .then(res => {
+        if (!res.ok) throw new Error("Erreur serveur : " + res.status);
+        return res.json();
+      })
+      .then(data => {
+        console.log("Données reçues du serveur !", data);
+        setSearchResults(data);
+      })
+      .catch(err => {
+        console.error("Erreur Fetch détectée :", err);
+        // Si ça échoue, on met un faux résultat pour tester l'affichage
+        setSearchResults([{id: 0, title: "Erreur de connexion au serveur", type: "error"}]);
+      });
+  } else {
+    setSearchResults([]);
+  }
+}}
+  />
+  <button className="hero-search-btn">🔍</button>
+
+  {/* Affichage des résultats sous la barre */}
+{/* La liste magique qui transforme ton JSON en visuel */}
+{searchResults.length > 0 && (
+  <div className="search-dropdown-results">
+    {searchResults.map((result) => (
+      <div 
+        key={`${result.type}-${result.id}`} 
+        className="search-item-row"
+onClick={() => {
+  if(result.type === 'groupe') {
+    navigate(`/groupe/${result.id}`); 
+  } else {
+    navigate('/biblio'); 
+  }
+
+  setSearchTerm("");
+  setSearchResults([]);
+}}
+      >
+        <span className="type-icon">{result.type === 'groupe' ? '👥' : '📄'}</span>
+        <span className="result-text">{result.title}</span>
       </div>
+    ))}
+  </div>
+)}
+</div>
       </section>
 
 
@@ -374,6 +428,7 @@ const handleLogout = () => {
       {isModalOpen && <CreateGroup closeModal={() => setIsModalOpen(false)} />}
       {isTodoOpen && <TodoModal closeModal={() => setIsTodoOpen(false)} />}
       {isNotifOpen && <NotifModal closeModal={() => setIsNotifOpen(false)} />}
+        {isAgendaOpen && <Agenda closeModal={() => setIsAgendaOpen(false)} />}
     </div>
 
     

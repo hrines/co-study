@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const app = express();
 const mysql = require('mysql2');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -10,7 +11,6 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs'); // Pour vérifier si le dossier existe
 
-const app = express();
 const server = http.createServer(app);
 const io = new Server(server , {
     cors: {
@@ -19,8 +19,11 @@ const io = new Server(server , {
 });
 
 
-
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173", // Ton port Vite (React)
+  methods: ["GET", "POST"],
+  credentials: true
+}));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json());
 
@@ -166,6 +169,25 @@ app.post('/api/upload', upload.single('fichier'), (req, res) => {
     });
 });
 
+// Récupérer les événements d'un étudiant
+app.get('/api/agenda/:userId', verifyToken, (req, res) => {
+  const sql = "SELECT * FROM agenda WHERE id_etudiant = ? ORDER BY date ASC";
+  db.query(sql, [req.params.userId], (err, results) => {
+    if (err) return res.status(500).json(err);
+    res.json(results);
+  });
+});
+
+// Ajouter un événement
+app.post('/api/agenda', verifyToken, (req, res) => {
+  const { titre, date, heure, description } = req.body;
+  const id_etudiant = req.user.id;
+  const sql = "INSERT INTO agenda (id_etudiant, titre, date, heure, description) VALUES (?, ?, ?, ?, ?)";
+  db.query(sql, [id_etudiant, titre, date, heure, description], (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json({ message: "Événement ajouté", id: result.insertId });
+  });
+});
 
 
 app.get('/api/profil/:id_etudiant', (req, res) => {
@@ -761,6 +783,31 @@ app.delete('/api/admin/refuser-groupe/:id',verifyToken ,(req, res) => {
         if (err) return res.status(500).send(err);
         res.status(200).send({ message: "Demande refusée et groupe supprimé." });
     });
+});
+
+
+
+// Route de recherche globale (Groupes + Documents)
+app.get('/api/search-all', (req, res) => {
+  const query = req.query.q;
+  const searchTerm = `%${query}%`;
+
+  // 1. Chercher dans les groupes (Table: groupes)
+  const sqlGroups = "SELECT id_groupe as id, nom_groupe as title, 'groupe' as type FROM groupes WHERE nom_groupe LIKE ?";
+  
+  db.query(sqlGroups, [searchTerm], (err, groups) => {
+    if (err) return res.status(500).json(err);
+
+    // 2. Chercher dans les fichiers (Table: fichiers) - CORRIGÉ ICI
+    const sqlDocs = "SELECT id_fichier as id, nom_fichier as title, 'document' as type FROM fichiers WHERE nom_fichier LIKE ?";
+    
+    db.query(sqlDocs, [searchTerm], (err, docs) => {
+      if (err) return res.status(500).json(err);
+
+      const results = [...groups, ...docs];
+      res.json(results);
+    });
+  });
 });
 
 

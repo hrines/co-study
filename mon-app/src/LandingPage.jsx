@@ -141,41 +141,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* --- FOOTER MODERNE --- */}
-      <footer className="main-footer" id="contact">
-        <div className="footer-content">
-          <div className="footer-column brand-col">
-            <h2 className="logo-text">Co'study</h2>
-            <p className="footer-desc">
-              La plateforme collaborative dédiée aux étudiants de l'Université d'Oran 1. 
-              Simplifiez votre réussite, ensemble.
-            </p>
-          <div className="social-links">
-              <i className="fab fa-facebook"></i>
-              <i className="fab fa-twitter"></i>
-            </div>
-          </div>
 
-          <div className="footer-column">
-            <h3>Liens Utiles</h3>
-            <ul>
-              <li><a href="#">Université Oran 1</a></li>
-              <li><a href="#">Bibliothèque Centrale</a></li>
-              <li><a href="#">Plateforme EDX</a></li>
-              <li><a href="#">Demande Diplôme</a></li>
-            </ul>
-          </div>
-
-          <div className="footer-column">
-            <h3>Contactez-nous</h3>
-            <p>Email: admin@costudy.dz</p>
-          </div>
-        </div>
-
-        <div className="footer-bottom">
-          <p>Copyright © 2026 - Développé par une étudiante de L3 Informatique. Tous droits réservés.</p>
-        </div>
-      </footer>
     </div>
   );
 };

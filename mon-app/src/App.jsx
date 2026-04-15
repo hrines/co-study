@@ -9,7 +9,7 @@ import CreateGroup from './CreateGroup'; // <-- AJOUTÉ
 import Biblio from './biblio';
 import AdminSy from './adminsy';
 import LandingPage from './LandingPage';
-
+import Agenda from './agenda';
 
 function App() {
   return (
@@ -25,6 +25,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/create-group" element={<CreateGroup />} />
+        <Route path="/agenda" element={<Agenda />} />
         
         {/* Pages de groupes */}
         <Route path="/groupe/:id" element={<GroupePage />} />

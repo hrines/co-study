@@ -48,8 +48,7 @@ const handleLogin = async (e) => {
         // Tes autres stockages (optionnels si tu utilises déjà l'objet 'user')
         localStorage.setItem('userName', data.user.prenom);
         localStorage.setItem('userFiliere', data.user.filiere);
-        localStorage.setItem('userId', data.user.id_etudiant); 
-        
+        localStorage.setItem('id_etudiant', data.user.id_etudiant);        
         navigate('/home');
       } else {
         setLoginError(data.message || 'Email ou mot de passe incorrect.');

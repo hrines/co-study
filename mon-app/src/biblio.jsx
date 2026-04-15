@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Biblio.css';
+import Footer from './footer';
 
 const Biblio = () => {
     const [fichiers, setFichiers] = useState([]);
@@ -9,7 +10,7 @@ const Biblio = () => {
     
     const fileInputRef = useRef(null);
     // Remplace tes lignes 11 et 22 par une seule source de vérité
-    const userId = localStorage.getItem('id_etudiant'); // Utilise le même nom que dans ton login
+    const userId = localStorage.getItem('userId'); 
     const token = localStorage.getItem('token');
     const categories = ['Cours', 'TD', 'TP', 'Résumés', 'Test', 'Examen'];
 
@@ -22,28 +23,28 @@ const Biblio = () => {
     };
 
  
-    useEffect(() => {
-        // 1. Charger les fichiers
-        fetch('http://localhost:5000/api/fichiers')
+useEffect(() => {
+    // 1. Charger tous les fichiers
+    fetch('http://localhost:5000/api/fichiers')
+        .then(res => res.json())
+        .then(data => setFichiers(Array.isArray(data) ? data : []))
+        .catch(err => console.error(err));
+
+    // 2. Charger les favoris de l'utilisateur actuel
+    if (userId && token) {
+        fetch(`http://localhost:5000/api/favoris/${userId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
             .then(res => res.json())
-            .then(data => setFichiers(Array.isArray(data) ? data : []))
-            .catch(err => console.error(err));
-
-        // 2. Charger les favoris avec Token
-        const storedUserId = localStorage.getItem('userId');
-        const token = localStorage.getItem('token');
-
-        if (storedUserId && storedUserId !== "0" && token) {
-            fetch(`http://localhost:5000/api/favoris/${storedUserId}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+            .then(data => {
+                // On s'assure que data est bien un tableau avant de mapper
+                if (Array.isArray(data)) {
+                    setFavorisIds(data.map(f => f.id_fichier));
+                }
             })
-                .then(res => res.json())
-                .then(data => {
-                    if (Array.isArray(data)) setFavorisIds(data.map(f => f.id_fichier));
-                })
-                .catch(err => console.error(err));
-        }
-    }, []);
+            .catch(err => console.error("Erreur chargement favoris:", err));
+    }
+}, [userId, token]);
 
     const handleDropzoneClick = () => {
         fileInputRef.current.click();
@@ -98,24 +99,44 @@ try {
 }
     };
 
-    const toggleFavori = async (idFichier) => {
-        const isFavori = favorisIds.includes(idFichier);
-        const method = isFavori ? 'DELETE' : 'POST';
-        const token = localStorage.getItem('token');
-        
+console.log("ID récupéré :", userId);
+console.log("Token récupéré :", token);
+
+const toggleFavori = async (idFichier) => {
+    if (!userId || !token) {
+        alert("Tu dois être connecté pour ajouter des favoris !");
+        return;
+    }
+
+    const isFavori = favorisIds.includes(idFichier);
+    const method = isFavori ? 'DELETE' : 'POST';
+    
+    try {
         const response = await fetch('http://localhost:5000/api/favoris', {
             method: method,
             headers: { 
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ id_etudiant: userId, id_fichier: idFichier })
+            body: JSON.stringify({ 
+                id_etudiant: userId, 
+                id_fichier: idFichier 
+            })
         });
 
         if (response.ok) {
-            setFavorisIds(prev => isFavori ? prev.filter(id => id !== idFichier) : [...prev, idFichier]);
+            setFavorisIds(prev => 
+                isFavori 
+                ? prev.filter(id => id !== idFichier) 
+                : [...prev, idFichier]
+            );
+        } else {
+            console.error("Erreur API Favoris:", response.status);
         }
-    };
+    } catch (err) {
+        console.error("Erreur réseau favoris:", err);
+    }
+};
 
     return (
         <div className="biblio-container">
@@ -222,6 +243,7 @@ try {
                     </div>
                 </aside>
             </div>
+            <Footer />
         </div>
     );
 };

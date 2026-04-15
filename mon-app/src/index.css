@@ -21,15 +21,64 @@
 }
 
 body.dark {
-  /* On adapte les nouvelles couleurs pour le dark mode */
-  --gris-fond: #0a141d;
-  --blanc: #112B3C;        /* On utilise le bleu foncé comme fond de carte */
-  --text-main: #ffffff;
-  --border-color: #205375;
-  --bleu-fonce: #0f172a;
-  --text-sub: #94a3b8;
+  /* --- Palette Fond (Tes codes Freepik) --- */
+  --bleu-fonce: #112B3C;      /* Un bleu pétrole très foncé pour le mode sombre */
+  --blanc: #205375;          /* Le bleu très foncé devient blanc en mode sombre */
+  --gris-fond: #205375;      /* Le bleu pétrole foncé (Fond d'écran principal) */
+  
+  /* --- Palette Texte --- */
+  --text-main: #FFFFFF;      /* Blanc pur pour les titres */
+  --text-sub: #EFEFEF;       /* Blanc cassé/gris très clair (Descriptions, Textes secondaires) */
+  
+  /* --- Accents & Interactions --- */
+  --accent-color: #F66B0E;   /* Ton Orange Co'study (Logo, Bouton Créer) */
+  --border-color: #5584A5;   /* Bleu clair acier (Bordures discrètes) */
+  --hover-color: #2C6E91;    /* Bleu légèrement plus clair pour le survol */
 }
 
+/* --- Ajustement du relief pour la Sidebar --- */
+body.dark .sidebar {
+  background-color: var(--bleu-fonce); /* Utilise le bleu acier moyen pour se détacher du fond */
+  border-right: 0.5px solid var(--border-color);
+}
+
+
+/* --- Ajustement du relief pour les Cartes (lorsqu'il y en aura) --- */
+body.dark .card,
+body.dark .groupe-card {
+  background-color: var(--blanc); /* Cartes acier sur fond pétrole */
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2); /* Ombre légère pour décoller */
+}
+
+
+
+
+/* --- Ajustement de la Barre de recherche (Hero) --- */
+body.dark .hero-search-bar {
+  background-color: #0C1E2A; /* Une version très sombre du pétrole */
+  color: white;
+  border: 1px solid var(--border-color);
+}
+
+
+/* Règle de secours pour la lisibilité */
+body.dark .nav-item .text, 
+body.dark .logo, 
+body.dark .sidebar-header {
+  color: #FFFFFF;
+}
+
+body.dark input {
+    background-color: #0f172a;
+    color: white;
+    border: 1px solid var(--border-color);
+}
+
+body.dark input::placeholder {
+    color: var(--text-sub);
+}
 .auth-btn, .cta-orange {
   background-color: var(--orange-accent);
   color: white;
@@ -41,3 +90,5 @@ body.dark {
   filter: brightness(1.1); /* Ça l'éclaircit un peu au survol */
   transform: translateY(-2px);
 }
+
+
