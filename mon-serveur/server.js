@@ -43,17 +43,21 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // --- CONNEXION BDD ---
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'pfe_db',
-    port: 3307 // Ton port MySQL spécifique
+const db = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: '', // Mets ton mot de passe ici s'il y en a un
+  database: 'pfe_db',
+  port: 3307 // On voit sur tes logs que ta BDD est sur le port 3307 !
 });
 
-db.connect((err) => {
-    if (err) console.error("Erreur SQL:", err.message);
-    else console.log("Connecté à la base de données sur le port 3307");
+// Test de connexion rapide
+db.getConnection((err, connection) => {
+    if (err) console.error("Erreur de pool MySQL:", err.message);
+    else {
+        console.log("Pool MySQL connecté avec succès !");
+        connection.release();
+    }
 });
 
 // --- 1. ROUTES D'AUTHENTIFICATION ---
@@ -211,22 +215,38 @@ app.get('/api/favoris/:id_etudiant', (req, res) => {
 
 // --- 2. GESTION DES GROUPES ---
 app.post('/api/create-group', verifyToken, (req, res) => {
-    const { nom_groupe, description, filiere, type_cursus, niveau, id_etudiant} = req.body;
-    const sql = "INSERT INTO groupes (nom_groupe, description, filiere, type_cursus, niveau, id_etudiant) VALUES (?, ?, ?, ?, ?, ?)";
-  
-  db.query(sql, [nom_groupe, description, filiere, type_cursus, niveau, id_etudiant], (err, result) => {
-    if (err) {
-      console.error("ERREUR SQL:", err); // ÇA va s'afficher dans ton terminal noir
-      return res.status(500).send({ message: err.message });
-    }
-    res.status(201).send({ message: 'Groupe créé avec succès !' });
-  });
+    const { nom_groupe, description, filiere, type_cursus, niveau, id_etudiant } = req.body;
+
+    // Utilisation des noms de colonnes vérifiés sur ton screenshot
+const sql = "INSERT INTO groupes (nom_groupe, description, filiere, type_cursus, niveau, id_etudiant, etat) VALUES (?, ?, ?, ?, ?, ?, 'en_attente')";    
+    db.query(sql, [nom_groupe, description, filiere, type_cursus, niveau, id_etudiant], (err, result) => {
+        if (err) {
+            console.error("Erreur SQL détaillée:", err);
+            return res.status(500).json({ message: "Erreur lors de la création." });
+        }
+
+        // Envoi de la notification à l'admin (id_etudiant = 1 pour admin@costudy.dz)
+        const idGroupe = result.insertId;
+        const msgAdmin = `Nouveau groupe à valider : ${nom_groupe}`;
+        const notifSql = "INSERT INTO notifications (id_etudiant, message, type, id_reference) VALUES (1, ?, 'adhesion', ?)";
+        
+        db.query(notifSql, [msgAdmin, idGroupe], (notifErr) => {
+            if (notifErr) console.error("Erreur notif admin:", notifErr);
+            
+            res.status(200).json({ 
+                message: "Demande envoyée ! L'admin doit valider votre groupe." 
+            });
+        });
+    });
 });
 
 app.get('/api/groupes/:niveau', (req, res) => {
   const { niveau } = req.params;
   const { filiere } = req.query;
-  const sql = "SELECT * FROM groupes WHERE niveau = ? AND filiere = ?";
+  
+  // AJOUT DE : AND etat = 'valide'
+  const sql = "SELECT * FROM groupes WHERE niveau = ? AND filiere = ? AND etat = 'valide'";
+  
   db.query(sql, [niveau, filiere], (err, results) => {
     if (err) return res.status(500).send({ message: 'Erreur serveur' });
     res.status(200).send(results);
@@ -235,26 +255,78 @@ app.get('/api/groupes/:niveau', (req, res) => {
 
 
 
+app.post('/api/groupes', verifyToken, (req, res) => {
+    const { nom_groupe, description, filiere, type_cursus, niveau } = req.body;
+    const id_etudiant = req.user.id; // Récupéré via le token
 
-app.post('/api/groupe/:id/ajouter', (req, res) => {
-    const { idEtudiantAjoute, idAdmin } = req.body; // L'ID du membre à ajouter et celui qui fait l'action
-    const groupId = req.params.id;
-
-    // 1. Vérifier d'abord si idAdmin est bien le créateur du groupe
-    const checkAdmin = "SELECT id_etudiant FROM groupes WHERE id_groupe = ?";
+    // On ajoute explicitement 'en_attente' pour que l'admin puisse le voir
+    const sql = "INSERT INTO groupes (nom_groupe, description, filiere, type_cursus, niveau, id_etudiant, etat) VALUES (?, ?, ?, ?, ?, ?, 'en_attente')";
     
-    db.query(checkAdmin, [groupId], (err, result) => {
-        if (result[0].id_etudiant !== idAdmin) {
-            return res.status(403).send("Seul l'admin peut ajouter des membres !");
-        }
-
-        // 2. Si c'est bon, on insère dans 'appartenir'
-        const sql = "INSERT INTO appartenir (id_groupe, id_etudiant) VALUES (?, ?)";
-        db.query(sql, [groupId, idEtudiantAjoute], (err, final) => {
-            if (err) return res.status(500).json(err);
-            res.send("Membre ajouté !");
-        });
+    db.query(sql, [nom_groupe, description, filiere, type_cursus, niveau, id_etudiant], (err, result) => {
+        if (err) return res.status(500).json(err);
+        res.status(201).json({ message: "Demande de création envoyée !" });
     });
+});
+
+
+
+
+
+
+
+// Route pour créer une notification
+app.post('/api/notifications', verifyToken, (req, res) => {
+    const { id_etudiant, message, type, id_groupe } = req.body;
+    const sql = "INSERT INTO notifications (id_etudiant, message, type, id_groupe) VALUES (?, ?, ?, ?)";
+    
+    db.query(sql, [id_etudiant, message, type, id_groupe], (err, result) => {
+        if (err) return res.status(500).json(err);
+        res.status(200).json({ message: "Notification envoyée" });
+    });
+});
+
+// Route pour récupérer les notifications d'un utilisateur (déjà commencée dans ton Home.jsx)
+app.get('/api/notifications/:userId', verifyToken, (req, res) => {
+    const { userId } = req.params;
+    // Correction du nom de la colonne : created_at au lieu de date_creation
+    const sql = "SELECT * FROM notifications WHERE id_etudiant = ? ORDER BY created_at DESC";
+    db.query(sql, [userId], (err, data) => {
+        if (err) return res.status(500).json(err);
+        res.json(data);
+    });
+});
+
+// Marquer une notif spécifique comme lue
+app.put('/api/notifications/:id/lu', verifyToken, (req, res) => {
+    const { id } = req.params;
+    const sql = "UPDATE notifications SET lu = 1 WHERE id = ?";
+    db.query(sql, [id], (err) => {
+        if (err) return res.status(500).json({ message: 'Erreur serveur' });
+        res.status(200).json({ message: 'Notification lue' });
+    });
+});
+
+// Tout marquer comme lu
+app.put('/api/notifications/lire-tout/:userId', verifyToken, (req, res) => {
+    const { userId } = req.params;
+    const sql = "UPDATE notifications SET lu = 1 WHERE id_etudiant = ?";
+    db.query(sql, [userId], (err) => {
+        if (err) return res.status(500).json({ message: 'Erreur serveur' });
+        res.status(200).json({ message: 'Tout est lu' });
+    });
+});
+
+
+
+// Exemple au moment de supprimer un groupe
+app.delete('/api/groupes/:id', verifyToken, (req, res) => {
+    const idGroupe = req.params.id;
+    
+    // 1. Récupérer tous les membres du groupe d'abord
+    // 2. Envoyer une notification à chacun d'eux
+    const msg = "Le groupe auquel vous apparteniez a été supprimé par l'administrateur.";
+    
+    // Logique SQL pour insérer la notification pour chaque membre...
 });
 
 
@@ -448,26 +520,23 @@ app.get('/api/groupe/:id', (req, res) => {
 
 app.get('/api/mes-groupes/:id_etudiant', (req, res) => {
   const { id_etudiant } = req.params;
-
-  // Cette requête récupère :
-  // 1. Les groupes où l'étudiant est le créateur (id_etudiant dans la table groupes)
-  // 2. Les groupes où l'étudiant est membre (via la table membres_groupe)
+  
+  // On n'affiche que les groupes validÉS
   const sql = `
-    SELECT * FROM groupes WHERE id_etudiant = ?
+    SELECT * FROM groupes WHERE id_etudiant = ? AND etat = 'valide'
     UNION
     SELECT g.* FROM groupes g
     INNER JOIN membres_groupe mg ON g.id_groupe = mg.id_groupe
-    WHERE mg.id_etudiant = ?
+    WHERE mg.id_etudiant = ? AND g.etat = 'valide'
   `;
 
   db.query(sql, [id_etudiant, id_etudiant], (err, results) => {
-    if (err) {
-      console.error("Erreur SQL Mes Groupes:", err);
-      return res.status(500).send({ message: 'Erreur serveur' });
-    }
+    if (err) return res.status(500).send({ message: 'Erreur serveur' });
     res.status(200).send(results);
   });
 });
+
+
 // vérifier les demandes déjà faites par un étudiant
 app.get('/api/mes-demandes/:id_etudiant', (req, res) => {
   const { id_etudiant } = req.params;
@@ -644,6 +713,59 @@ app.get('/api/admin/pending-registrations', (req, res) => {
         res.json(results);
     });
 });
+
+
+app.get('/api/admin/pending-groups/:filiere/:niveau', (req, res) => {
+    const { filiere, niveau } = req.params;
+    
+    // On enlève "u.nom" car la jointure pose problème ou la colonne n'existe pas
+    const sql = "SELECT * FROM groupes WHERE filiere = ? AND niveau = ? AND etat = 'en_attente'";
+    
+    db.query(sql, [filiere, niveau], (err, results) => {
+        if (err) return res.status(500).json(err);
+        res.json(results);
+    });
+});
+
+
+
+
+
+
+
+
+
+
+// Route pour que l'admin valide un groupe
+app.put('/api/admin/valider-groupe/:id', verifyToken, (req, res) => {
+    // Optionnel : vérification supplémentaire dans la route
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ message: "Accès refusé. Droits administrateur requis." });
+    }
+
+    const { id } = req.params;
+    const sql = "UPDATE groupes SET etat = 'valide' WHERE id_groupe = ?";
+
+    db.query(sql, [id], (err, result) => {
+        if (err) return res.status(500).json(err);
+        res.status(200).json({ message: "Groupe validé !" });
+    });
+});
+
+// Route pour que l'admin refuse (supprime)
+app.delete('/api/admin/refuser-groupe/:id',verifyToken ,(req, res) => {
+    const { id } = req.params;
+    const sql = "DELETE FROM groupes WHERE id_groupe = ? AND etat = 'en_attente'";
+
+    db.query(sql, [id], (err, result) => {
+        if (err) return res.status(500).send(err);
+        res.status(200).send({ message: "Demande refusée et groupe supprimé." });
+    });
+});
+
+
+
+
 
 // --- 5. SOCKET.IO (CHAT) ---
 io.on('connection', (socket) => {

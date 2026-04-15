@@ -2,44 +2,44 @@ import React, { useEffect, useState } from 'react';
 import './NotifModal.css';
 
 const NotifModal = ({ closeModal }) => {
-  const [notifications, setNotifications] = useState([]);
- const user = JSON.parse(localStorage.getItem('user'));
+const [notifications, setNotifications] = useState([]);
+const user = JSON.parse(localStorage.getItem('user'));
 const userId = user ? user.id_etudiant : null;
+const token = localStorage.getItem('token');
 
   // Charger les notifications
- useEffect(() => {
+useEffect(() => {
+        if (!userId || !token) return;
 
-console.log("VALEUR DE USER DANS LOCALSTORAGE:", localStorage.getItem('user'));
-    console.log("ID EXTRAIT ET UTILISÉ POUR FETCH:", userId);
+        fetch(`http://localhost:5000/api/notifications/${userId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (Array.isArray(data)) {
+                setNotifications(data);
+            } else {
+                setNotifications([]);
+            }
+        })
+        .catch(err => {
+            console.error("Erreur fetch notifications:", err);
+            setNotifications([]);
+        });
+    }, [userId, token]);
 
-    if (!userId) return;
-
-    fetch(`http://localhost:5000/api/notifications/${userId}`)
-      .then(res => res.json())
-      .then(data => {
-        // FORCE DATA À ÊTRE UN TABLEAU
-        if (Array.isArray(data)) {
-            setNotifications(data);
-        } else {
-            setNotifications([]); // Si le serveur envoie un message d'erreur, on met un tableau vide
+// Marquer tout comme lu
+    const toutLire = async () => {
+        try {
+            await fetch(`http://localhost:5000/api/notifications/lire-tout/${userId}`, { 
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            setNotifications([]); 
+        } catch (err) {
+            console.error("Erreur toutLire:", err);
         }
-      })
-      .catch(err => {
-        console.error("Erreur fetch notifications:", err);
-        setNotifications([]); // En cas d'erreur réseau, évite le crash
-      });
-}, [userId]);
-
-  // Marquer tout comme lu
-const toutLire = async () => {
-  try {
-    await fetch(`http://localhost:5000/api/notifications/lire-tout/${userId}`, { method: 'PUT' });
-    // On vide tout pour ne plus rien afficher dans la modale
-    setNotifications([]); 
-  } catch (err) {
-    console.error("Erreur:", err);
-  }
-};
+    };
 
 
 // Accepter une demande

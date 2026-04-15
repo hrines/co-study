@@ -8,7 +8,9 @@ const Biblio = () => {
     const [modulesOuverts, setModulesOuverts] = useState({});
     
     const fileInputRef = useRef(null);
-    const userId = localStorage.getItem('userId') || 0;
+    // Remplace tes lignes 11 et 22 par une seule source de vérité
+    const userId = localStorage.getItem('id_etudiant'); // Utilise le même nom que dans ton login
+    const token = localStorage.getItem('token');
     const categories = ['Cours', 'TD', 'TP', 'Résumés', 'Test', 'Examen'];
 
     const toggleModule = (catName, moduleName) => {
@@ -19,6 +21,7 @@ const Biblio = () => {
         }));
     };
 
+ 
     useEffect(() => {
         // 1. Charger les fichiers
         fetch('http://localhost:5000/api/fichiers')
@@ -73,23 +76,26 @@ const Biblio = () => {
         formData.append('annee', annee);
         formData.append('filiere', 'L3 Informatique');
 
-        try {
-            const response = await fetch('http://localhost:5000/api/upload', {
-                method: 'POST',
-                body: formData,
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
+try {
+    const response = await fetch('http://localhost:5000/api/upload', {
+        method: 'POST',
+        headers: { 
+            // On ne met PAS de Content-Type ici, le navigateur le fait pour le FormData
+            'Authorization': `Bearer ${token}` 
+        },
+        body: formData,
+    });
 
-            if (response.ok) {
-                alert("Fichier envoyé avec succès !");
-                window.location.reload(); 
-            } else {
-                const data = await response.json();
-                alert("Erreur : " + (data.message || "Accès refusé"));
-            }
-        } catch (err) {
-            console.error(err);
-        }
+    if (response.ok) {
+        alert("Fichier envoyé avec succès ! Il sera visible après validation.");
+        window.location.reload(); 
+    } else {
+        const errorData = await response.json();
+        alert("Erreur : " + (errorData.message || "Échec de l'envoi"));
+    }
+} catch (err) {
+    console.error("Erreur réseau :", err);
+}
     };
 
     const toggleFavori = async (idFichier) => {
@@ -174,7 +180,10 @@ const Biblio = () => {
                                                                     onClick={() => toggleFavori(file.id_fichier)}
                                                                 > ★ </button>
                                                                 <a href={`http://localhost:5000/${file.url_fichier}`} target="_blank" rel="noopener noreferrer" className="file-link-container">
-                                                                    <div className="file-icon">📄</div>
+                                                                    <div className="file-icon">
+                                                                    {file.nom_fichier.endsWith('.pdf') ? '📕' : 
+                                                                      file.nom_fichier.endsWith('.docx') ? '📘' : '📄'}
+                                                                    </div>
                                                                     <div className="file-info">
                                                                         <h4 title={file.nom_fichier}>{file.nom_fichier}</h4>
                                                                         <span className="view-link">Ouvrir le document</span>

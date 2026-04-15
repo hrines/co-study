@@ -15,14 +15,17 @@ const CreateGroup = ({ closeModal }) => {
     // On récupère l'objet user complet
 const user = JSON.parse(localStorage.getItem('user'));
 const userId = user ? user.id_etudiant : null;
-   const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // 1. On récupère le TOKEN et l'ID utilisateur
+    const token = localStorage.getItem('token'); 
     const id_etudiant = user?.id_etudiant; 
 
-  if (!id_etudiant) {
-    alert("Vous devez être connecté pour créer un groupe");
-    return;
-  }
+    if (!id_etudiant || !token) {
+      alert("Vous devez être connecté pour créer un groupe");
+      return;
+    }
     
     const groupeData = {
       nom_groupe: nomGroupe,
@@ -30,25 +33,43 @@ const userId = user ? user.id_etudiant : null;
       filiere,
       type_cursus: typeCursus,
       niveau,
-      id_etudiant : user?.id_etudiant // On envoie aussi l'id de l'étudiant qui crée le groupe
+      id_etudiant: id_etudiant 
     };
+
     try {
-      const response = await fetch('http://localhost:5000/api/create-group', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(groupeData),
-      });
+// Dans ton handleSubmit de CreateGroup.jsx
+const response = await fetch('http://localhost:5000/api/create-group', {
+  method: 'POST',
+  headers: { 
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}` 
+  },
+  body: JSON.stringify(groupeData),
+});
+
+if (response.ok) {
+  // CHANGEMENT DU MESSAGE : Plus honnête pour l'utilisateur
+  alert("Demande envoyée ! L'administrateur doit valider la création de votre groupe.");
+  closeModal();
+}
+
       const data = await response.json();
+
       if (response.ok) {
         alert('Groupe créé avec succès !');
         closeModal();
+        // Optionnel : recharger la page pour voir le nouveau groupe
+        window.location.reload(); 
       } else {
-        alert('Erreur : ' + data.message);
+        alert('Erreur : ' + (data.message || "Accès refusé"));
       }
     } catch (error) {
+      console.error("Erreur creation groupe:", error);
       alert('Le serveur ne répond pas.');
     }
   };
+
+
 
   return (
     <div className="create-group-container"> {/* AJOUT DE CETTE DIV */}
