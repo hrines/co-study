@@ -1,143 +1,151 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './GestionMembres.css'; // On réutilise le même CSS pour la cohérence
+import './GestionGroupes.css';
 
 const GestionGroupes = ({ filiere, niveau }) => {
-  const [groupes, setGroupes] = useState([]);
+  const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [view, setView] = useState('pending'); // Par défaut on affiche les demandes
+  const [view, setView] = useState('existing'); // 'existing' ou 'pending'
 
   useEffect(() => {
-    const fetchGroupes = async () => {
+    const fetchGroups = async () => {
+      if (!filiere || !niveau) {
+        setGroups([]);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       try {
-        // 'active' -> groupes validés, 'pending' -> groupes en attente
-        const endpoint = view === 'active' ? `groupes/${niveau}?filiere=${filiere}` : `admin/pending-groups/${filiere}/${niveau}`;
-        const response = await axios.get(`http://localhost:5000/api/${endpoint}`);
+        // ✅ Route différente selon la vue
+        const endpoint = view === 'pending' 
+          ? `admin/pending-groups/${filiere}/${niveau}`
+          : `admin/groups/${filiere}/${niveau}`;
         
-        setGroupes(Array.isArray(response.data) ? response.data : []);
+        const url = `http://localhost:5000/api/${endpoint}`;
+        console.log("📡 Requête vers:", url);
+        
+        const response = await axios.get(url);
+        setGroups(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
-        console.error("Erreur serveur :", error);
-        setGroupes([]);
+        console.error("❌ Erreur fetch groupes:", error);
+        setGroups([]);
       } finally {
         setLoading(false);
       }
     };
-    fetchGroupes();
-  }, [view, filiere, niveau]);
 
-const handleAction = async (id, action) => {
-  const confirmMsg = action === 'valider' ? "Approuver ce groupe ?" : "Supprimer ce groupe ?";
-  if (!window.confirm(confirmMsg)) return;
+    fetchGroups();
+  }, [filiere, niveau, view]);
 
-  try {
-    const token = localStorage.getItem('token');
-    const method = action === 'valider' ? 'put' : 'delete';
-    const url = action === 'valider' 
-      ? `http://localhost:5000/api/admin/valider-groupe/${id}`
-      : `http://localhost:5000/api/admin/refuser-groupe/${id}`;
+  const handleDelete = async (groupId) => {
+    if (!window.confirm("Supprimer ce groupe définitivement ?")) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(
+        `http://localhost:5000/api/groupe/${groupId}`,
+        { headers: { 'Authorization': `Bearer ${token}` }}
+      );
+      setGroups(groups.filter(g => g.id_groupe !== groupId));
+      alert("🗑️ Groupe supprimé !");
+    } catch (error) {
+      console.error("Erreur suppression:", error);
+      alert("Erreur lors de la suppression");
+    }
+  };
 
-    // ✅ CORRECTION : method (variable) au lieu de 'put' (string fixe)
-    await axios({
-      method: method,
-      url: url,
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    setGroupes(groupes.filter(g => (g.id_groupe || g.id) !== id));
-    alert(action === 'valider' ? "Groupe activé !" : "Action effectuée.");
-  } catch (error) {
-    console.error("Erreur action admin:", error);
-    alert("Erreur lors de l'opération");
+  if (!filiere || !niveau) {
+    return (
+      <div className="management-container">
+        <div className="empty-state">
+          <p>⚠️ Sélectionnez une filière et un niveau.</p>
+        </div>
+      </div>
+    );
   }
-};
 
-  if (loading) return <div className="loading-state">Chargement des groupes...</div>;
+  if (loading) {
+    return (
+      <div className="management-container">
+        <div className="loading-state">Chargement des groupes...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="management-container">
       <header className="management-header">
         <div className="header-text">
           <h1>Gestion des Groupes</h1>
-          <p>Administration des espaces de travail pour {filiere} ({niveau})</p>
+          <p>Filière: {filiere} | Niveau: {niveau}</p>
+        </div>
+        
+        {/* Onglets pour switcher */}
+        <div className="view-tabs">
+          <button 
+            className={`tab-btn ${view === 'existing' ? 'active' : ''}`}
+            onClick={() => setView('existing')}
+          >
+            ✅ Groupes Validés ({groups.length})
+          </button>
+          <button 
+            className={`tab-btn ${view === 'pending' ? 'active' : ''}`}
+            onClick={() => setView('pending')}
+          >
+            ⏳ En Attente
+          </button>
         </div>
       </header>
 
-      {/* Barre de navigation entre Actifs et En attente */}
-  {/* Barre de navigation entre Actifs et En attente */}
-<div className="view-selector card">
-  <button 
-    className={`btn-view ${view === 'pending' ? 'active' : ''}`} 
-    onClick={() => setView('pending')}
-  >
-    Demandes en attente
-  </button>
-  <button 
-    className={`btn-view ${view === 'active' ? 'active' : ''}`} 
-    onClick={() => setView('active')}
-  >
-    Groupes Actifs
-  </button>
-</div>
-
-      <div className="action-bar card">
-        <div className="search-box">
-          <span>🔍</span>
-          <input 
-            type="text" 
-            placeholder="Rechercher un groupe..." 
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div className="table-container card">
-        <table className="user-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nom du Groupe</th>
-              <th>Description</th>
-              <th>Créateur</th>
-              <th>Statut</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {groupes.length > 0 ? (
-              groupes
-                .filter(g => (g.nom_groupe || "").toLowerCase().includes(searchTerm.toLowerCase()))
-                .map(groupe => (
-                  <tr key={groupe.id_groupe}>
-                    <td>#{groupe.id_groupe}</td>
-                    <td className="user-cell"><strong>{groupe.nom_groupe}</strong></td>
-                    <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {groupe.description}
-                    </td>
-                    <td>ID Etudiant: {groupe.id_etudiant}</td>
-                    <td>
-                      <span className={`status-badge ${view === 'active' ? 'status-active' : 'status-inactive'}`}>
-                        {view === 'active' ? 'Validé' : 'En attente'}
-                      </span>
-                    </td>
-                    <td className="actions-cell">
-                      {view === 'pending' && (
-                        <button onClick={() => handleAction(groupe.id_groupe, 'valider')} className="icon-btn edit" title="Valider">✅</button>
-                      )}
-                      <button onClick={() => handleAction(groupe.id_groupe, 'refuser')} className="icon-btn delete" title="Supprimer">🗑️</button>
-                    </td>
-                  </tr>
-                ))
-            ) : (
-              <tr>
-                <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>
-                  Aucun groupe trouvé dans cette catégorie.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <div className="cards-grid">
+        {groups.length > 0 ? (
+          groups.map(group => (
+            <div key={group.id_groupe} className="group-card">
+              <h3>{group.nom_groupe}</h3>
+              <p className="group-description">{group.description || 'Pas de description'}</p>
+              
+              <div className="group-meta">
+                <span>🎓 {group.filiere}</span>
+                <span>📚 {group.niveau}</span>
+                <span>👤 Créateur: {group.createur_nom || 'ID: ' + group.id_etudiant}</span>
+                {group.created_at && (
+                  <span>📅 {new Date(group.created_at).toLocaleDateString('fr-FR')}</span>
+                )}
+              </div>
+              
+              <div className="group-actions">
+                {view === 'existing' && (
+                  <button 
+                    className="btn-delete"
+                    onClick={() => handleDelete(group.id_groupe)}
+                  >
+                    🗑️ Supprimer
+                  </button>
+                )}
+                {view === 'pending' && (
+                  <>
+                    <button className="btn-validate" onClick={() => handleValidate(group.id_groupe)}>
+                      ✅ Valider
+                    </button>
+                    <button className="btn-refuse" onClick={() => handleRefuse(group.id_groupe)}>
+                      ❌ Refuser
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="empty-state">
+            <p>
+              {view === 'existing' 
+                ? `Aucun groupe validé pour ${filiere} - ${niveau}`
+                : `Aucun groupe en attente pour ${filiere} - ${niveau}`
+              }
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

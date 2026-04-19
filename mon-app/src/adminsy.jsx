@@ -35,19 +35,22 @@ import GestionFichiers from './GestionFichiers';
 
 
 useEffect(() => {
-    if (selection.niveau && selection.filiere) {
-fetch(`http://localhost:5000/api/admin/stats/${selection.filiere}/${selection.niveau}`)
-        .then(res => res.json())
-        .then(data => {
-          setStats({
-            fichiers: data.fichiersEnAttente || 0,
-            membres: data.totalEtudiants || 0,
-            groupes: data.groupesEnAttente || 0
-          });
-        })
-        .catch(err => console.error("Erreur stats:", err));
-    }
-  }, [selection]);
+  if (selection.niveau && selection.filiere) {
+    fetch(`http://localhost:5000/api/admin/stats/${selection.filiere}/${selection.niveau}`)
+      .then(res => res.json())
+      .then(data => {
+        setStats({
+          fichiers: data.fichiersEnAttente || 0,
+          membres: data.totalEtudiants || 0,
+          groupes: data.groupesEnAttente || 0
+        });
+      })
+      .catch(err => {
+        // Garde juste cette erreur silencieuse
+        console.error("Stats error:", err);
+      });
+  }
+}, [selection]);
 
   return (
     <div className="admin-layout">
@@ -146,12 +149,12 @@ fetch(`http://localhost:5000/api/admin/stats/${selection.filiere}/${selection.ni
   </button>
 </div>
 
-      {/* 3. ZONE DE TRAVAIL (Le contenu des fichiers) */}
-      <div className="admin-sections-container">
-        {ongletActif === 'membres' && <GestionMembres niveau={selection.niveau} />}
-        {ongletActif === 'groupes' && <GestionGroupes niveau={selection.niveau} />}
-        {ongletActif === 'fichiers' && <GestionFichiers niveau={selection.niveau} />}
-      </div>
+{/* 3. ZONE DE TRAVAIL (Le contenu des fichiers) */}
+<div className="admin-sections-container">
+  {ongletActif === 'membres' && <GestionMembres filiere={selection.filiere} niveau={selection.niveau} />}
+  {ongletActif === 'groupes' && <GestionGroupes filiere={selection.filiere} niveau={selection.niveau} />}     
+  {ongletActif === 'fichiers' && <GestionFichiers filiere={selection.filiere} niveau={selection.niveau} />}    
+</div>
     </div>
   ) : (
     <div className="welcome-admin">

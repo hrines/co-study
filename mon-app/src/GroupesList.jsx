@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './GroupesList.css';
 import { useTheme } from './ThemeContext';
+import Footer from './footer';
 
 const GroupesList = () => {
   const { niveau } = useParams();
@@ -118,6 +119,7 @@ const annulerDemande = async (idGroupe) => {
           ))
         )}
       </div>
+      <Footer />
     </div>
   );
 };

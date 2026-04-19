@@ -131,6 +131,20 @@
     border-radius: 50%;
     object-fit: cover;
 }
+.user-avatar-badge {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--bleu-moyen), var(--bleu-fonce));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-right: 0.8rem;
+  flex-shrink: 0;
+}
 
 .email-cell {
     color: var(--bleu-moyen);

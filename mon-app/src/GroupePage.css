@@ -1,130 +1,517 @@
+/* ==========================================
+   GROUPE PAGE - CO'STUDY THEME
+   ========================================== */
+
 .groupe-page {
+  min-height: 100vh;
+  background: var(--gris-fond);
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  background: var(--gris-fond);
-  color: var(--text-main);
 }
 
+/* ==========================================
+   HEADER
+   ========================================== */
 .groupe-header {
+  background: linear-gradient(135deg, var(--bleu-fonce) 0%, var(--bleu-moyen) 100%);
+  color: var(--blanc);
+  padding: 1.2rem 2rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem 2rem;
-  background: var(--blanc);
-  border-bottom: 0.1rem solid var(--border-color);
+  gap: 1.5rem;
   box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.groupe-info {
-  flex: 1;
+.back-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: var(--blanc);
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(-2px);
 }
 
 .groupe-info h2 {
-  font-size: 1.2rem;
+  margin: 0;
+  font-size: 1.4rem;
   font-weight: 700;
-  color: var(--bleu-fonce);
 }
 
 .groupe-info span {
   font-size: 0.85rem;
-  color: var(--text-sub);
+  opacity: 0.85;
 }
 
-.back-btn {
-  background: var(--gris-fond);
-  border: 0.1rem solid var(--border-color);
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  position: relative;
+}
+
+.dark-mode-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: var(--blanc);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: var(--transition);
+}
+
+.dark-mode-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.menu-dots {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: var(--blanc);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.3rem;
+  transition: var(--transition);
+}
+
+.menu-dots:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ==========================================
+   DROPDOWN MENU
+   ========================================== */
+.dropdown-chat-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: var(--blanc);
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(17, 43, 60, 0.2);
+  min-width: 250px;
+  z-index: 1000;
+  padding: 0.5rem 0;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  padding: 0.9rem 1.2rem;
+  background: none;
+  border: none;
+  text-align: left;
   cursor: pointer;
   color: var(--text-main);
-  font-weight: 600;
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.menu-item:hover {
+  background: var(--gris-fond);
+}
+
+.menu-item.danger {
+  color: #e74c3c;
+}
+
+.menu-item.danger:hover {
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.admin-divider {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--border-color);
+  margin-bottom: 0.3rem;
+}
+
+.menu-separator {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 0.4rem 0;
+}
+
+/* ==========================================
+   BANDEAU MESSAGE ÉPINGLÉ
+   ========================================== */
+.pinned-banner {
+  background: linear-gradient(135deg, var(--orange-accent), #ff8533);
+  color: var(--blanc);
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 10px rgba(246, 107, 14, 0.3);
+}
+
+.pinned-banner span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.back-btn:hover {
-  background: var(--bleu-fonce);
-  color: white;
+.unpin-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: var(--blanc);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: var(--transition);
+  margin-left: 1rem;
 }
 
-.chat-zone {
+.unpin-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================
+   CONTENU PRINCIPAL
+   ========================================== */
+.groupe-content {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 0;
+  flex: 1;
+  height: calc(100vh - 80px);
+}
+
+/* ==========================================
+   SIDEBAR - MEMBRES
+   ========================================== */
+.groupe-sidebar {
+  background: var(--blanc);
+  border-right: 1px solid var(--border-color);
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.groupe-sidebar h3 {
+  margin: 0 0 1.5rem 0;
+  color: var(--text-main);
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.membres-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.membre-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.9rem;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  transition: var(--transition);
+  position: relative;
+}
+
+.membre-item:hover {
+  background: var(--gris-fond);
+}
+
+.membre-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--bleu-moyen), var(--bleu-fonce));
+  color: var(--blanc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.membre-info {
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.membre-nom {
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 0.95rem;
   overflow: hidden;
-  padding: 1rem 2rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.membre-role {
+  font-size: 0.75rem;
+  color: var(--text-sub);
+  font-weight: 500;
+}
+
+.membre-role.admin {
+  color: var(--orange-accent);
+  font-weight: 700;
+}
+
+.kick-btn {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  font-size: 1.3rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: var(--transition);
+  padding: 0.3rem;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.membre-item:hover .kick-btn {
+  opacity: 1;
+}
+
+.kick-btn:hover {
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.btn-rejoindre {
+  width: 100%;
+  padding: 1rem;
+  background: var(--orange-accent);
+  color: var(--blanc);
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.btn-rejoindre:hover {
+  background: #e55a00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(246, 107, 14, 0.3);
+}
+
+/* ==========================================
+   ZONE DE CHAT
+   ========================================== */
+.groupe-chat {
+  display: flex;
+  flex-direction: column;
+  background: var(--gris-fond);
+  overflow: hidden;
+}
+
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
 }
 
-.messages-list {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 0.5rem;
+.no-messages {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--text-sub);
 }
 
+.no-messages p {
+  margin: 0.5rem 0;
+}
+
+.no-messages p:first-child {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* ==========================================
+   MESSAGES
+   ========================================== */
 .message {
   display: flex;
   flex-direction: column;
-  max-width: 60%;
+  max-width: 70%;
+  animation: messageSlide 0.3s ease;
+}
+
+@keyframes messageSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .message.mine {
   align-self: flex-end;
-  align-items: flex-end;
 }
 
 .message.theirs {
   align-self: flex-start;
-  align-items: flex-start;
 }
 
 .msg-auteur {
-  font-size: 0.75rem;
-  color: var(--text-sub);
-  margin-bottom: 0.2rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--bleu-moyen);
+  margin-bottom: 0.3rem;
+  margin-left: 0.3rem;
 }
 
 .msg-bubble {
   background: var(--blanc);
-  padding: 0.6rem 1rem;
-  border-radius: 1rem;
-  font-size: 0.95rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 18px;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(17, 43, 60, 0.08);
+  position: relative;
+  word-wrap: break-word;
+  line-height: 1.5;
   color: var(--text-main);
-  border: 0.1rem solid var(--border-color);
 }
 
 .message.mine .msg-bubble {
-  background: var(--bleu-fonce);
-  color: white;
-  border: none;
+  background: linear-gradient(135deg, var(--bleu-moyen), var(--bleu-fonce));
+  color: var(--blanc);
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 4px;
+}
+
+.message.pinned .msg-bubble {
+  border: 2px solid var(--orange-accent);
+}
+
+.pin-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--orange-accent);
+  color: var(--blanc);
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(246, 107, 14, 0.4);
 }
 
 .msg-heure {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--text-sub);
-  margin-top: 0.2rem;
+  margin-top: 0.3rem;
+  margin-left: 0.3rem;
 }
 
+.message.mine .msg-heure {
+  text-align: right;
+}
+
+.pin-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: var(--transition);
+  padding: 2px 6px;
+  margin-left: 8px;
+  border-radius: 4px;
+}
+
+.msg-bubble:hover .pin-btn {
+  opacity: 1;
+}
+
+.pin-btn:hover {
+  background: rgba(246, 107, 14, 0.15);
+}
+
+/* ==========================================
+   INPUT MESSAGE
+   ========================================== */
 .chat-input {
   display: flex;
-  gap: 0.75rem;
-  padding: 0.75rem;
+  gap: 0.8rem;
+  padding: 1.2rem 1.5rem;
   background: var(--blanc);
-  border-radius: 0.75rem;
-  border: 0.1rem solid var(--border-color);
+  border-top: 1px solid var(--border-color);
 }
 
 .chat-input input {
   flex: 1;
-  border: none;
-  background: transparent;
+  padding: 0.9rem 1.2rem;
+  border: 2px solid var(--border-color);
+  border-radius: 25px;
   font-size: 0.95rem;
-  color: var(--text-main);
   outline: none;
+  transition: var(--transition);
+  background: var(--gris-fond);
+  color: var(--text-main);
+}
+
+.chat-input input:focus {
+  border-color: var(--bleu-moyen);
+  background: var(--blanc);
 }
 
 .chat-input input::placeholder {
@@ -132,202 +519,391 @@
 }
 
 .chat-input button {
-  background: var(--bleu-fonce);
-  color: white;
+  background: var(--orange-accent);
+  color: var(--blanc);
   border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   cursor: pointer;
-}
-
-.chat-input button:hover {
-  background: var(--vert-clair);
-}
-
-
-
-.dropdown-chat-menu {
-  position: absolute;
-  top: 50px;
-  right: 10px;
-  background: #1c242f; /* Couleur sombre style Telegram */
-  border-radius: 12px;
-  width: 250px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-  padding: 8px 0;
-  z-index: 1000;
-  color: white;
-}
-
-.menu-item {
+  font-size: 1.2rem;
+  transition: var(--transition);
   display: flex;
   align-items: center;
-  padding: 12px 16px;
-  width: 100%;
-  border: none;
-  background: none;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background 0.2s;
+  justify-content: center;
 }
 
-.menu-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+.chat-input button:hover:not(:disabled) {
+  background: #e55a00;
+  transform: scale(1.05);
 }
 
-.menu-item svg {
-  margin-right: 15px;
-  opacity: 0.7;
+.chat-input button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.danger-text {
-  color: #ff595a !important;
+/* ==========================================
+   MESSAGE NON MEMBRE
+   ========================================== */
+.not-member-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+  gap: 1rem;
+  height: 100%;
 }
 
-.admin-header {
-  padding: 10px 16px;
-  font-size: 12px;
-  text-transform: uppercase;
-  color: #708499;
-  font-weight: bold;
+.not-member-message h3 {
+  font-size: 1.5rem;
+  color: var(--text-main);
+  margin: 0;
 }
 
-
-.pinned-banner button {
-    background: transparent;
-    border: none;
-    color: white;
-    font-size: 1.2rem;
-    cursor: pointer;
-    margin-left: auto; /* Pousse le X tout à droite */
-    padding: 0 10px;
-    opacity: 0.7;
+.not-member-message p {
+  color: var(--text-sub);
+  margin: 0;
+  max-width: 400px;
 }
 
-.pinned-banner button:hover {
-    opacity: 1;
-    color: #ff4757; /* Un petit rouge discret au survol */
-}
-
-
-/* Overlay : l'arrière-plan semi-transparent */
+/* ==========================================
+   MODAL
+   ========================================== */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7); /* Effet d'assombrissement */
+  right: 0;
+  bottom: 0;
+  background: rgba(17, 43, 60, 0.7);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px); /* Petit effet de flou pour le style */
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease;
 }
 
-/* Le contenu de la fenêtre */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .modal-content {
-  background: var(--bg-secondary, #2c2f33); /* S'adapte à ton thème Discord-style */
-  color: white;
-  padding: 1.5rem;
-  border-radius: 0.8rem;
+  background: var(--blanc);
+  border-radius: 16px;
   width: 90%;
-  max-width: 450px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  max-width: 550px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(17, 43, 60, 0.3);
+  animation: modalSlide 0.3s ease;
+}
+
+@keyframes modalSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.2rem;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  padding-bottom: 0.5rem;
+  padding: 1.5rem;
+  border-bottom: 2px solid var(--border-color);
+  background: linear-gradient(135deg, var(--bleu-fonce), var(--bleu-moyen));
+  color: var(--blanc);
+  border-radius: 16px 16px 0 0;
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 1.2rem;
+  font-weight: 700;
 }
 
-/* Section d'ajout de membre */
-.add-member-section {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.add-member-section input {
-  flex: 1;
-  padding: 0.6rem;
-  border-radius: 0.4rem;
+.modal-close {
+  background: rgba(255, 255, 255, 0.15);
   border: none;
-  background: #23272a;
-  color: white;
-}
-
-.add-member-section button {
-  background: #5865f2; /* Bleu type Discord/Flow */
-  color: white;
-  border: none;
-  padding: 0.6rem 1rem;
-  border-radius: 0.4rem;
+  color: var(--blanc);
+  font-size: 1.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.add-member-section button:hover {
-  background: #4752c4;
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
-/* Liste des membres dans le modal */
-.members-list-admin {
-  max-height: 250px;
-  overflow-y: auto;
+.modal-body {
+  padding: 1.5rem;
+}
+
+/* Section ajouter membre */
+.add-member-section label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.8rem;
+  font-size: 0.95rem;
+}
+
+.add-member-input {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.add-member-input input {
+  flex: 1;
+  padding: 0.8rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: var(--transition);
+  background: var(--gris-fond);
+  color: var(--text-main);
+}
+
+.add-member-input input:focus {
+  border-color: var(--bleu-moyen);
+  background: var(--blanc);
+}
+
+.add-member-input button {
+  padding: 0.8rem 1.5rem;
+  background: var(--orange-accent);
+  color: var(--blanc);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.add-member-input button:hover {
+  background: #e55a00;
+}
+
+.help-text {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-sub);
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.modal-body hr {
+  border: none;
+  border-top: 2px solid var(--border-color);
+  margin: 1.5rem 0;
+}
+
+/* Liste membres admin */
+.members-list-admin p {
+  margin: 0 0 1rem 0;
+  color: var(--text-sub);
+  font-size: 0.9rem;
 }
 
 .member-row {
   display: flex;
-  justify-content: space-between; /* Pousse le nom à gauche et le bouton à droite */
+  justify-content: space-between;
   align-items: center;
-  padding: 0.8rem;
-  background: rgba(255, 255, 255, 0.05);
-  margin-bottom: 0.5rem;
-  border-radius: 0.4rem;
-  transition: background 0.2s;
+  padding: 1rem;
+  background: var(--gris-fond);
+  border-radius: 10px;
+  margin-bottom: 0.7rem;
+  transition: var(--transition);
 }
 
 .member-row:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: #e8e8e8;
 }
 
-.remove-member-btn {
-  background: transparent;
+.member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.member-name {
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 0.95rem;
+}
+
+.member-id {
+  font-size: 0.8rem;
+  color: var(--text-sub);
+}
+
+.member-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: var(--bleu-moyen);
+  color: var(--blanc);
+  font-weight: 600;
+  margin-top: 3px;
+}
+
+.member-badge.admin {
+  background: var(--orange-accent);
+}
+
+.kick-btn-modal {
+  background: #e74c3c;
+  color: var(--blanc);
   border: none;
-  color: #ff4757; /* Un rouge corail pour signaler l'action */
-  font-size: 1.1rem;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
   cursor: pointer;
-  padding: 5px 10px;
-  border-radius: 4px;
-  transition: all 0.2s;
+  font-weight: bold;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.remove-member-btn:hover {
-  background: rgba(255, 71, 87, 0.1);
+.kick-btn-modal:hover {
+  background: #c0392b;
   transform: scale(1.1);
 }
-.kick-btn {
-  background: #ed4245;
-  color: white;
-  border: none;
-  padding: 0.3rem 0.6rem;
-  border-radius: 0.3rem;
-  font-size: 0.8rem;
-  cursor: pointer;
+
+/* ==========================================
+   LOADING & ERROR
+   ========================================== */
+.groupe-page-loading,
+.groupe-page-error {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  background: var(--gris-fond);
+  color: var(--text-main);
 }
 
-.kick-btn:hover {
-  background: #c03537;
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--orange-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.groupe-page-error h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text-main);
+}
+
+.groupe-page-error button {
+  padding: 0.9rem 2rem;
+  background: var(--bleu-moyen);
+  color: var(--blanc);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.groupe-page-error button:hover {
+  background: var(--bleu-fonce);
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+@media (max-width: 968px) {
+  .groupe-content {
+    grid-template-columns: 280px 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .groupe-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .groupe-sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    max-height: 300px;
+  }
+  
+  .message {
+    max-width: 85%;
+  }
+  
+  .groupe-header {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .groupe-info h2 {
+    font-size: 1.1rem;
+  }
+  
+  .dropdown-chat-menu {
+    right: -10px;
+    min-width: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .groupe-header {
+    padding: 0.8rem;
+  }
+  
+  .groupe-info h2 {
+    font-size: 1rem;
+  }
+  
+  .dark-mode-btn,
+  .menu-dots {
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+  }
+  
+  .chat-input {
+    padding: 1rem;
+  }
+  
+  .chat-input input {
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .chat-input button {
+    width: 42px;
+    height: 42px;
+  }
 }

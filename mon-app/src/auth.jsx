@@ -20,14 +20,22 @@ function Auth() {
   const [firstName, setFirstName] = useState('');
   const [matricule, setMatricule] = useState('');
   const [filiere, setFiliere] = useState('');
+  const [cursus, setCursus] = useState('LMD'); // ✅ NOUVEAU : LMD ou Ingénieur
+  const [niveau, setNiveau] = useState('');     // ✅ NOUVEAU : Niveau sélectionné
   const [password, setPassword] = useState('');
   const [showSignupPw, setShowSignupPw] = useState(false);
   const [signupLoading, setSignupLoading] = useState(false);
   const [signupError, setSignupError] = useState('');
   const [signupSuccess, setSignupSuccess] = useState('');
 
+  // Niveaux disponibles par type de cursus
+  const niveaux = {
+    LMD: ['L1', 'L2', 'L3', 'M1', 'M2'],
+    Ingenieur: ['1ere', '2eme', '3eme', '4eme', '5eme']
+  };
+
   // --- Handlers ---
-const handleLogin = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoginLoading(true);
     setLoginError('');
@@ -41,14 +49,14 @@ const handleLogin = async (e) => {
       const data = await response.json();
       
       if (response.ok) {
-        // --- LES 2 LIGNES CLÉS POUR LE JWT ---
-        localStorage.setItem('token', data.token); // On stocke le ticket de sécurité
-        localStorage.setItem('user', JSON.stringify(data.user)); // On stocke les infos utilisateur
-        
-        // Tes autres stockages (optionnels si tu utilises déjà l'objet 'user')
-        localStorage.setItem('userName', data.user.prenom);
+        // Stocker TOUTES les infos utiles
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('userId', data.user.id_etudiant);
+        localStorage.setItem('userName', data.user.nom);
         localStorage.setItem('userFiliere', data.user.filiere);
-        localStorage.setItem('id_etudiant', data.user.id_etudiant);        
+        localStorage.setItem('userNiveau', data.user.niveau); // ✅ Stocker le niveau
+        
         navigate('/home');
       } else {
         setLoginError(data.message || 'Email ou mot de passe incorrect.');
@@ -60,11 +68,19 @@ const handleLogin = async (e) => {
       setLoginLoading(false);
     }
   };
+
   const handleSignup = async (e) => {
     e.preventDefault();
     setSignupLoading(true);
     setSignupError('');
     setSignupSuccess('');
+    
+    if (!niveau) {
+      setSignupError('Veuillez sélectionner votre niveau d\'étude.');
+      setSignupLoading(false);
+      return;
+    }
+    
     try {
       const response = await fetch('http://localhost:5000/api/signup', {
         method: 'POST',
@@ -74,8 +90,10 @@ const handleLogin = async (e) => {
           nom: name,
           prenom: firstName,
           matricule,
-          mot_de_passe: password,
           filiere,
+          cursus,      // ✅ Envoyer le type de cursus
+          niveau,      // ✅ Envoyer le niveau
+          mot_de_passe: password,
         }),
       });
 
@@ -122,6 +140,7 @@ const handleLogin = async (e) => {
     </div>
     <div className="auth-page">
       <div className="auth-forms-wrapper">
+        
         {/* Formulaire LOGIN */}
         <div className={`auth-form-panel ${isLogin ? 'active' : 'hidden'}`}>
           <h1 className="auth-title">Connexion</h1>
@@ -150,7 +169,6 @@ const handleLogin = async (e) => {
                 <a href="/forgot-password">Mot de passe oublié ?</a>
               </div>
             </div> 
-
             <button type="submit" className="auth-submit" disabled={loginLoading}>
               {loginLoading ? <span className="auth-spinner" /> : 'Se connecter'}
             </button>
@@ -164,6 +182,8 @@ const handleLogin = async (e) => {
           {signupError && <div className="auth-error">{signupError}</div>}
           {signupSuccess && <div className="auth-success">{signupSuccess}</div>}
           <form onSubmit={handleSignup} className="auth-form">
+            
+            {/* Nom + Prénom */}
             <div className="auth-row">
               <div className="auth-field">
                 <label>Nom</label>
@@ -174,18 +194,48 @@ const handleLogin = async (e) => {
                 <input type="text" placeholder="Prénom" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
               </div>
             </div>
+            
+            {/* Email + Matricule */}
             <div className="auth-field"><label>Email</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
             <div className="auth-field"><label>Matricule</label><input type="text" value={matricule} onChange={(e) => setMatricule(e.target.value)} required /></div>
+            
+            {/* ✅ NOUVEAU : Filière + Cursus + Niveau */}
+            <div className="auth-row">
+              <div className="auth-field">
+                <label>Filière</label>
+                <select value={filiere} onChange={(e) => setFiliere(e.target.value)} required>
+                  <option value="">Sélectionnez</option>
+                  <option value="informatique">Informatique</option>
+                  <option value="mathematiques">Mathématiques</option>
+                  <option value="chimie">Chimie</option>
+                  <option value="physique">Physique</option>
+                </select>
+              </div>
+              
+              <div className="auth-field">
+                <label>Cursus</label>
+                <select value={cursus} onChange={(e) => {
+                  setCursus(e.target.value);
+                  setNiveau(''); // Reset niveau quand on change de cursus
+                }} required>
+                  <option value="LMD">LMD</option>
+                  <option value="Ingenieur">Ingénieur</option>
+                </select>
+              </div>
+            </div>
+            
+            {/* Niveau dynamique */}
             <div className="auth-field">
-              <label>Filière</label>
-              <select value={filiere} onChange={(e) => setFiliere(e.target.value)} required>
-                <option value="">Sélectionnez votre filière</option>
-                <option value="informatique">Informatique</option>
-                <option value="mathematiques">Mathématiques</option>
-                <option value="chimie">Chimie</option>
-                <option value="physique">Physique</option>
+              <label>Niveau</label>
+              <select value={niveau} onChange={(e) => setNiveau(e.target.value)} required disabled={!filiere}>
+                <option value="">Sélectionnez votre niveau</option>
+                {niveaux[cursus]?.map(niv => (
+                  <option key={niv} value={niv}>{niv}</option>
+                ))}
               </select>
             </div>
+            
+            {/* Mot de passe */}
             <div className="auth-field">
               <label>Mot de passe</label>
               <div className="auth-input-icon">
@@ -193,7 +243,10 @@ const handleLogin = async (e) => {
                 <button type="button" className="toggle-pw" onClick={() => setShowSignupPw(!showSignupPw)}><EyeIcon /></button>
               </div>
             </div>
-            <button type="submit" className="auth-submit" disabled={signupLoading}>{signupLoading ? <span className="auth-spinner" /> : "S'inscrire"}</button>
+            
+            <button type="submit" className="auth-submit" disabled={signupLoading}>
+              {signupLoading ? <span className="auth-spinner" /> : "S'inscrire"}
+            </button>
           </form>
         </div>
 
@@ -207,7 +260,6 @@ const handleLogin = async (e) => {
               <><h2>Déjà inscrit ?</h2><p>Connecte-toi vite à ton espace !</p><button className="auth-overlay-btn" onClick={() => setIsLogin(true)}>Se connecter</button></>
             )}
           </div>
-          {/* Formes décoratives */}
           <div className="auth-left-shapes">
              <div className="shape shape-1"></div>
              <div className="shape shape-2"></div>
@@ -216,7 +268,7 @@ const handleLogin = async (e) => {
         </div>
       </div>
     </div>
-  </>
+    </>
   );
 }
 

@@ -1,259 +1,471 @@
-/* Biblio.css - Version Optimisée Flow */
+/* ==========================================
+   BIBLIO.CSS - CO'STUDY THEME (STRICT PALETTE)
+   ========================================== */
 
+/* ========== LAYOUT PRINCIPAL ========== */
 .biblio-container {
-    padding: 2.5rem; /* 40px */
-    background-color: #f8faff;
-    min-height: 100vh;
+  min-height: 100vh;
+  background: var(--gris-fond);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
-/* 1. Layout Principal (2 colonnes) */
 .biblio-main-content {
-    display: flex;
-    gap: 2rem;
-    margin-top: 2rem;
+  flex: 1;
+  display: flex;
+  gap: 2rem;
+  padding: 2rem 2.5rem;
+  width: 100%;
 }
 
 .biblio-left {
-    flex: 3; /* Zone des dossiers */
+  flex: 3;
+  min-width: 0;
 }
 
 .biblio-right {
-    flex: 1; /* Panneau stats StuDocu */
-    position: sticky;
-    top: 2rem;
-    height: fit-content;
+  flex: 1;
+  position: sticky;
+  top: 2rem;
+  height: fit-content;
+  min-width: 17.5rem;
 }
 
-/* 2. Bannière Upload */
+/* ========== BANNIÈRE UPLOAD (Style demandé + Palette Co'Study) ========== */
 .upload-banner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #e9f0ff;
-    padding: 2.5rem;
-    border-radius: 1.25rem;
-    margin-bottom: 2.5rem;
+  /* Dégradé utilisant tes bleus */
+  background: linear-gradient(135deg, var(--bleu-fonce), var(--bleu-moyen));
+  color: white;
+  padding: 3rem 2.5rem;
+  border-radius: 1rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  box-shadow: var(--shadow);
 }
 
-.underline-blue {
-    border-bottom: 4px solid #1877f2;
-    padding-bottom: 0.5rem;
-    color: #2d3436;
+.upload-banner h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: white; /* Texte blanc sur fond bleu foncé */
+  margin: 0;
+  flex: 1;
+}
+
+/* Ligne orange sous le titre pour rappeler la charte */
+.upload-banner h2::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 0.25rem;
+  background: var(--orange-accent);
+  margin-top: 0.5rem;
+  border-radius: 0.12rem;
 }
 
 .upload-dropzone {
-    background: white;
-    padding: 1.25rem;
-    border-radius: 1rem;
-    border: 2px dashed #1877f2;
-    text-align: center;
-    width: 18.75rem; /* 300px */
-    cursor: pointer;
-    transition: background 0.3s;
+  background: var(--blanc);
+  color: var(--text-main);
+  border: 0.12rem dashed var(--bleu-moyen); /* Pointillés bleu moyen */
+  border-radius: 1rem;
+  padding: 2rem 2.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 20rem;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
 }
 
 .upload-dropzone:hover {
-    background: #f0f5ff;
+  background: var(--gris-fond);
+  border-color: var(--orange-accent); /* Devient orange au survol */
+  transform: translateY(-0.2rem);
+  box-shadow: 0 0.5rem 1rem rgba(246, 107, 14, 0.15);
 }
 
-/* 3. Filtres Année */
+.upload-dropzone-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.8rem;
+  display: block;
+}
+
+.upload-dropzone-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.3rem;
+  display: block;
+}
+
+.upload-dropzone-hint {
+  font-size: 0.9rem;
+  color: var(--text-sub);
+  font-style: italic;
+  display: block;
+}
+
+/* ========== FILTRES ========== */
 .shelves-filters {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
 }
 
 .shelves-filters button {
-    padding: 0.5rem 1.2rem;
-    border-radius: 2rem;
-    border: 1px solid var(--border-color);
-    background: white;
-    cursor: pointer;
-    transition: all 0.2s;
+  padding: 0.6rem 1.4rem;
+  border-radius: 1.5rem;
+  border: 0.06rem solid var(--border-color);
+  background: var(--blanc);
+  color: var(--text-sub);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.shelves-filters button:hover {
+  border-color: var(--bleu-moyen);
+  color: var(--bleu-moyen);
 }
 
 .shelves-filters button.active {
-    background: #1877f2;
-    color: white;
-    border-color: #1877f2;
+  background: var(--bleu-moyen);
+  color: white;
+  border-color: var(--bleu-moyen);
+  box-shadow: 0 0.25rem 0.75rem rgba(32, 83, 117, 0.3);
 }
 
-/* 4. Étagères (Grille de dossiers) */
+/* ========== ÉTAGÈRES & MODULES ========== */
 .shelf {
-    margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
 }
 
 .shelf-title {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    border-left: 5px solid #1877f2;
-    padding-left: 1rem;
-    margin-bottom: 1.25rem;
-    color: #2d3436;
-    font-size: 1.4rem;
-}
-
-
-
-/* La ligne qui contient les cartes */
-.shelf-row {
   display: flex;
-  flex-wrap: wrap; /* Permet d'aller à la ligne si trop de fichiers */
-  gap: 20px;
-  padding: 15px 0;
+  align-items: center;
+  gap: 0.8rem;
+  border-left: 0.3rem solid var(--orange-accent);
+  padding-left: 1rem;
+  margin-bottom: 1.5rem;
+  color: var(--bleu-fonce);
+  font-size: 1.4rem;
+  font-weight: 700;
 }
 
-/* La carte individuelle */
+.module-section {
+  margin-bottom: 2rem;
+  background: var(--blanc);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.module-subtitle {
+  font-size: 1.1rem;
+  color: var(--bleu-fonce);
+  margin-bottom: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 0.12rem solid var(--border-color);
+}
+
+.module-subtitle::before {
+  content: "📚";
+  font-size: 1.2rem;
+}
+
+/* Grille de fichiers */
+.shelf-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1.2rem;
+}
+
+/* ========== CARTE DE FICHIER ========== */
 .file-card {
   position: relative;
-  width: 160px; /* Largeur fixe pour éviter l'écrasement */
-  background: white;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  transition: transform 0.2s;
+  background: var(--blanc);
+  border-radius: 0.75rem;
+  padding: 1.2rem;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  border: 0.06rem solid transparent;
+  cursor: pointer;
 }
 
 .file-card:hover {
-  transform: translateY(-5px);
-}
-/* Bouton favori en haut à droite */
-.star-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #ccc;
-  font-size: 1.2rem;
+  transform: translateY(-0.3rem);
+  box-shadow: 0 0.5rem 1.5rem rgba(17, 43, 60, 0.15);
+  border-color: var(--bleu-moyen);
 }
 
-.star-btn.active {
-  color: #ffc107;
-}
-.file-icon { 
-    font-size: 2.5rem; 
-    margin-bottom: 0.8rem; 
-}
-.file-info h4 {
-  font-size: 0.9rem;
-  color: #333;
-  margin: 5px 0;
-  /* TRÈS IMPORTANT : Empêche le texte de déborder */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis; 
-  width: 130px; /* Doit être un peu plus petit que la carte */
-}
-.view-link {
-  font-size: 0.75rem;
-  color: #007bff;
-  text-decoration: underline;
-}
-
-.file-info span {
-    font-size: 0.75rem;
-    color: var(--text-sub);
-}
-
-/* 6. Widget Stats (Style StuDocu) */
-.bib-stats-card {
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: 0.8rem;
-    padding: 1.5rem;
-}
-
-.bib-stats-card h3 {
-    font-size: 1.1rem;
-    margin-bottom: 1.2rem;
-    color: var(--bleu-fonce);
-}
-
-.stat-item {
-    display: flex;
-    justify-content: space-between; /* Valeur à droite comme StuDocu */
-    align-items: center;
-    padding: 0.7rem 0;
-    border-bottom: 1px solid #f1f4f8;
-}
-
-.stat-label { color: #636e72; font-size: 0.9rem; }
-.stat-value { font-weight: 700; color: #2d3436; }
-
-
-/* Organisation par module */
-.module-section {
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    background: rgba(24, 119, 242, 0.02); /* Très léger fond bleu pour grouper */
-    border-radius: 1rem;
-}
-
-.module-subtitle {
-    font-size: 1rem;
-    color: var(--bleu-fonce);
-    margin-bottom: 1rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-  gap: 10px;
-  background: #f0f4f8;
-  padding: 10px 15px;
-  border-radius: 8px;
-  margin-top: 10px;
-  transition: background 0.3s;
-  user-select: none; /* Empêche de sélectionner le texte au double clic */
-  
-}
-.module-subtitle:hover {
-  background: #e2e8f0;
-}
-
-.module-subtitle::before {
-    content: "•";
-    margin-right: 0.5rem;
-    color: #1877f2;
-}
-
-/* Mise à jour de la grille pour les fichiers */
-.shelf-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 1rem;
-    padding-left: 20px; /* Petit décalage pour l'effet de sous-menu */
-  border-left: 2px solid #3b82f6; /* Ligne bleue comme dans ton menu de gauche */
-  margin-left: 10px;
-}
-
-
-
-.file-link {
-    text-decoration: none; /* Enlève le soulignement */
-    color: inherit; /* Garde les couleurs du texte d'origine */
-    display: block;
-    cursor: pointer;
-}
-.file-link-container {
-    text-decoration: none; /* Enlève le soulignement bleu des liens */
-    color: inherit;       /* Garde la couleur de ton texte actuel */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
+.file-icon {
+  font-size: 3rem;
+  margin-bottom: 0.8rem;
+  transition: transform 0.3s ease;
 }
 
 .file-card:hover .file-icon {
-    transform: scale(1.1);
-    transition: transform 0.2s;
+  transform: scale(1.15);
 }
-.file-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+
+.file-info h4 {
+  font-size: 0.9rem;
+  color: var(--text-main);
+  margin: 0.5rem 0;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  max-width: 8.75rem;
+}
+
+.file-info span {
+  font-size: 0.75rem;
+  color: var(--text-sub);
+  display: block;
+  margin-top: 0.3rem;
+}
+
+.star-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ccc; /* Gris standard pour l'étoile inactive */
+  font-size: 1.3rem;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.star-btn:hover {
+  transform: scale(1.2);
+}
+
+.star-btn.active {
+  color: var(--orange-accent); /* Orange quand actif */
+}
+
+.view-link {
+  font-size: 0.8rem;
+  color: var(--bleu-moyen);
+  text-decoration: none;
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+.view-link:hover {
+  color: var(--orange-accent);
+}
+
+/* ========== WIDGET STATS ========== */
+.bib-stats-card {
+  background: var(--blanc);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 0.06rem solid var(--border-color);
+}
+
+.bib-stats-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1.2rem;
+  color: var(--bleu-fonce);
+  font-weight: 700;
+  padding-bottom: 0.8rem;
+  border-bottom: 0.12rem solid var(--border-color);
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 0;
+  border-bottom: 0.06rem solid var(--border-color);
+}
+
+.stat-item:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  color: var(--text-sub);
+  font-size: 0.9rem;
+}
+
+.stat-value {
+  font-weight: 700;
+  color: var(--bleu-fonce);
+  font-size: 1rem;
+}
+
+/* ========== MESSAGE VIDE ========== */
+.empty-msg {
+  text-align: center;
+  color: var(--text-sub);
+  padding: 4rem 2rem;
+  font-size: 1.1rem;
+  background: var(--blanc);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow);
+}
+
+/* ========== FOOTER PROFESSIONNEL ========== */
+.footer {
+  background: linear-gradient(135deg, var(--bleu-fonce), var(--bleu-moyen));
+  color: white;
+  padding: 3rem 2rem 1.5rem 2rem;
+  margin-top: auto;
+  border-top: 0.2rem solid var(--orange-accent);
+  width: 100%;
+}
+
+.footer-content {
+  width: 100%;
+  max-width: 75rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 2rem;
+}
+
+.footer-section h3 {
+  color: var(--orange-accent);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03rem;
+}
+
+.footer-section p,
+.footer-section a {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.9rem;
+  line-height: 1.8;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.footer-section a:hover {
+  color: var(--orange-accent);
+  padding-left: 0.3rem;
+}
+
+.footer-bottom {
+  width: 100%;
+  max-width: 75rem;
+  margin: 0 auto;
+  padding-top: 1.5rem;
+  border-top: 0.06rem solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 64rem) {
+  .biblio-main-content {
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+  
+  .biblio-right {
+    position: static;
+    width: 100%;
+  }
+  
+  .upload-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem 1.5rem;
+  }
+  
+  .upload-banner h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .upload-banner h2::after {
+    display: none;
+  }
+  
+  .upload-dropzone {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 48rem) {
+  .biblio-container {
+    padding: 0;
+  }
+  
+  .biblio-main-content {
+    padding: 1rem;
+  }
+  
+  .shelf-row {
+    grid-template-columns: repeat(auto-fill, minmax(8.125rem, 1fr));
+    gap: 1rem;
+  }
+  
+  .file-card {
+    padding: 1rem;
+  }
+  
+  .file-icon {
+    font-size: 2.5rem;
+  }
+  
+  .footer {
+    padding: 2rem 1rem 1rem 1rem;
+  }
+}
+
+/* ========== DARK MODE ========== */
+.dark-mode .bib-stats-card,
+.dark-mode .module-section,
+.dark-mode .file-card,
+.dark-mode .empty-msg {
+  background: #16213e; /* Gardé car c'est une surcharge dark mode spécifique */
+  border-color: #3a3a5a;
+}
+
+.dark-mode .file-info h4 {
+  color: var(--text-dark-main);
+}
+
+.dark-mode .shelves-filters button {
+  background: #16213e;
+  color: var(--text-dark-sub);
+  border-color: #3a3a5a;
+}
+
+.dark-mode .shelves-filters button.active {
+  background: var(--bleu-moyen);
+  color: white;
 }

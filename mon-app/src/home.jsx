@@ -1,420 +1,462 @@
-
-import { useTheme } from './ThemeContext'; 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from './ThemeContext';
 import './home.css';
+import Footer from './footer';
 
-// Tes composants
+// Composants modaux
 import CreateGroup from './CreateGroup';
 import TodoModal from './TodoModal';
 import NotifModal from './NotifModal';
 import Agenda from './agenda';
 
-
-
-
 const Home = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+  const { darkMode, toggleDarkMode } = useTheme();
+
+  // ==========================================
+  // ÉTATS
+  // ==========================================
+  const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const navigate = useNavigate();  
-  const nomClient = localStorage.getItem("userName");
-  const userId = localStorage.getItem('userId');
-  // Dans Home.jsx, plus tard
-const avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${nomClient || 'Guest'}&backgroundColor=205375`;
-
-  const [isCollapsed, setIsCollapsed] = useState(false);  // État pour gérer si le menu est réduit ou pas
-  const toggleSidebar = () => { setIsCollapsed(!isCollapsed);};  // Fonction pour inverser l'état du menu
   
-  const [isTodoOpen, setIsTodoOpen] = useState(false); // Modal To-Do List
-  const [isGroupeOpen, setIsGroupeOpen] = useState(false); // Menu principal "Groupes"
-  const [selectedSystem, setSelectedSystem] = useState(null); // "LMD" ou "Ingenieur"
-
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isTodoOpen, setIsTodoOpen] = useState(false);
+  const [isGroupeOpen, setIsGroupeOpen] = useState(false);
   const [isAgendaOpen, setIsAgendaOpen] = useState(false);
-  const levels = {
-     LMD: ['L1', 'L2', 'L3', 'M1', 'M2'],
-     Ingenieur: ['1ere', '2eme', '3eme', '4eme', '5eme']
-};
-const [isModalOpen, setIsModalOpen] = useState(false);
-//mes groupes = groupes dont je fais partie 
-const [mesGroupes, setMesGroupes] = useState([]);
-const [nbNotifs, setNbNotifs] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  
+  const [selectedSystem, setSelectedSystem] = useState(null);
+  const [mesGroupes, setMesGroupes] = useState([]);
+  const [nbNotifs, setNbNotifs] = useState(0);
+  
+  // Pomodoro
+  const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const [isActive, setIsActive] = useState(false);
+  const [mode, setMode] = useState('work');
+
+  // ==========================================
+  // UTILS : Récupération sécurisée de userId
+  // ==========================================
+  const getUserId = useCallback(() => {
+    // 1. Essayer userId direct
+    let id = localStorage.getItem('userId');
+    if (id) return id;
+    
+    // 2. Essayer de parser l'objet user
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        if (user?.id_etudiant) return user.id_etudiant;
+        if (user?.id) return user.id;
+      }
+    } catch (e) {
+      console.warn('⚠️ Impossible de parser user:', e);
+    }
+    
+    // 3. Essayer de décoder le token JWT
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.id || payload.userId || payload.id_etudiant;
+      }
+    } catch (e) {
+      console.warn('⚠️ Impossible de décoder token:', e);
+    }
+    
+    return null;
+  }, []);
+
+  const userId = getUserId();
+  const nomClient = localStorage.getItem('userName');
+  const avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${nomClient || 'Guest'}&backgroundColor=205375`;
+
+  // ==========================================
+  // REDIRECTION SI NON CONNECTÉ
+  // ==========================================
+  useEffect(() => {
+    if (!nomClient || !userId) {
+      navigate('/auth', { replace: true });
+    }
+  }, [nomClient, userId, navigate]);
+
+  // ==========================================
+  // POMODORO TIMER
+  // ==========================================
+  const setTimerMode = (minutes, newMode) => {
+    setIsActive(false);
+    setTimeLeft(minutes * 60);
+    setMode(newMode);
+  };
 
   useEffect(() => {
-    if (!nomClient) {
-      navigate('/auth'); // Redirige vers la page de connexion si pas de nom trouvé
-    }
-  }, [nomClient, navigate]);
-
-  
-
-
-
-const [timeLeft, setTimeLeft] = useState(25 * 60); // 25 min par défaut
-const [isActive, setIsActive] = useState(false);
-const [mode, setMode] = useState('work'); // 'work' ou 'break'
-
-// Fonction pour changer le temps selon le besoin
-const setTimerMode = (minutes, type) => {
-  setIsActive(false); // On stop si ça tournait
-  setTimeLeft(minutes * 60);
-  setMode(type);
-};
-
-
-/*sonnerie pomodoro
-const playBeep = () => {
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const oscillator = ctx.createOscillator();
-  const gainNode = ctx.createGain();
-  oscillator.connect(gainNode);
-  gainNode.connect(ctx.destination);
-  oscillator.frequency.value = 880;
-  oscillator.type = 'sine';
-  gainNode.gain.setValueAtTime(1, ctx.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1);
-  oscillator.start(ctx.currentTime);
-  oscillator.stop(ctx.currentTime + 1);
-};*/
-
-// moteur du pomodoro
-useEffect(() => {
-  let interval = null;
-  if (isActive && timeLeft > 0) {
-    interval = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
-    }, 1000);
-  } else if (timeLeft === 0) {
-    clearInterval(interval);
-    /*playBeep();*/ // Sonnerie à la fin du timer (optionnel)
-    if (mode === 'work') {
-      setMode('break');
-      setTimeLeft(5 * 60);
-      setIsActive(true);
-    } else {
-      setMode('work');
-      setTimeLeft(25 * 60);
-      setIsActive(true);
-    }
-  }
-  return () => clearInterval(interval);
-}, [isActive, timeLeft, mode]);
-
-
-
-// Charger le nombre de notifs non lues
-useEffect(() => {
-  if (!userId) return;
-
-  const token = localStorage.getItem('token'); // On récupère le badge
-
-  fetch(`http://localhost:5000/api/notifications/${userId}`, {
-    headers: {
-      'Authorization': `Bearer ${token}` // On l'envoie au serveur
-    }
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (Array.isArray(data)) {
-        setNbNotifs(data.filter(n => n.lu === 0).length);
+    let interval = null;
+    if (isActive && timeLeft > 0) {
+      interval = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+    } else if (timeLeft === 0) {
+      // Auto-switch work/break
+      if (mode === 'work') {
+        setMode('break');
+        setTimeLeft(5 * 60);
+      } else {
+        setMode('work');
+        setTimeLeft(25 * 60);
       }
-    })
-    .catch(err => console.error(err));
-}, [userId]);
-
-useEffect(() => {
-  if (!nomClient) {
-    navigate('/auth'); 
-  }
-}, [nomClient, navigate]);
-
-// Charger TOUS les groupes (Créés + Rejoints)
-useEffect(() => {
-  if (!userId) return;
-
-  const token = localStorage.getItem('token');
-
-  fetch(`http://localhost:5000/api/mes-groupes/${userId}`, {
-    headers: {
-      'Authorization': `Bearer ${token}`
+      setIsActive(true);
     }
-  })
-    .then(res => res.json())
-    .then(data => setMesGroupes(data))
-    .catch(err => console.error(err));
-}, [userId]);
+    return () => clearInterval(interval);
+  }, [isActive, timeLeft, mode]);
 
-const { darkMode, toggleDarkMode } = useTheme();
-const [isNotifOpen, setIsNotifOpen] = useState(false);
+  // ==========================================
+  // NOTIFICATIONS : Chargement + Badge
+  // ==========================================
+  const fetchNotifCount = useCallback(() => {
+    if (!userId) return;
+    const token = localStorage.getItem('token');
+    
+    fetch(`http://localhost:5000/api/notifications/${userId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setNbNotifs(data.filter(n => n.lu === 0).length);
+        }
+      })
+      .catch(err => console.error('❌ Erreur chargement notifs:', err));
+  }, [userId]);
 
+  // Charger au montage + rafraîchir toutes les 30s
+  useEffect(() => {
+    fetchNotifCount();
+    const interval = setInterval(fetchNotifCount, 30000);
+    return () => clearInterval(interval);
+  }, [fetchNotifCount]);
 
-const handleLogout = () => {
-    localStorage.clear(); // Ça enlève userName, userId ET le token d'un coup
-    navigate('/auth');
-};
+  // Fonction à passer au modal pour rafraîchir le badge
+  const refreshNotifCount = useCallback(() => {
+    fetchNotifCount();
+  }, [fetchNotifCount]);
 
+  // ==========================================
+  // GROUPES : Chargement des groupes utilisateur
+  // ==========================================
+  useEffect(() => {
+    if (!userId) return;
+    
+    const token = localStorage.getItem('token');
+    
+    fetch(`http://localhost:5000/api/mes-groupes/${userId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log('📦 Groupes chargés:', data?.length || 0);
+        setMesGroupes(Array.isArray(data) ? data : []);
+      })
+      .catch(err => console.error('❌ Erreur chargement groupes:', err));
+  }, [userId]);
 
+  // ==========================================
+  // RECHERCHE GLOBALE
+  // ==========================================
+  const handleSearch = useCallback((val) => {
+    setSearchTerm(val);
+    
+    if (val.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
 
+    fetch(`http://localhost:5000/api/search-all?q=${encodeURIComponent(val)}`)
+      .then(res => {
+        if (!res.ok) throw new Error(`Erreur ${res.status}`);
+        return res.json();
+      })
+      .then(data => setSearchResults(Array.isArray(data) ? data : []))
+      .catch(err => {
+        console.error('❌ Erreur recherche:', err);
+        setSearchResults([]);
+      });
+  }, []);
 
+  const handleSearchResultClick = (result) => {
+    if (result.type === 'groupe') {
+      navigate(`/groupe/${result.id}`);
+    } else {
+      navigate('/biblio');
+    }
+    setSearchTerm('');
+    setSearchResults([]);
+  };
 
-console.log("État actuel - Terme:", searchTerm, "Résultats:", searchResults);
+  // ==========================================
+  // ACTIONS
+  // ==========================================
+  const toggleSidebar = () => setIsCollapsed(prev => !prev);
+  
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/auth', { replace: true });
+  };
+
+  const levels = {
+    LMD: ['L1', 'L2', 'L3', 'M1', 'M2'],
+    Ingenieur: ['1ere', '2eme', '3eme', '4eme', '5eme']
+  };
+
+  // ==========================================
+  // AFFICHAGE : Loading
+  // ==========================================
+  if (!nomClient || !userId) {
+    return (
+      <div className="loading-fullscreen">
+        <div className="spinner" />
+        <p>Chargement...</p>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // RENDER PRINCIPAL
+  // ==========================================
   return (
-    <div className={`dashboard-layout ${isCollapsed ? 'collapsed' : ''}`}>
-{/* 1. BARRE LATÉRALE (SIDEBAR) */}
+    <div className={`dashboard-layout ${isCollapsed ? 'collapsed' : ''} ${darkMode ? 'dark' : ''}`}>
+      
+      {/* ========== SIDEBAR ========== */}
       <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
-       <div className="sidebar-header">
-       {!isCollapsed && <div className="logo">Flow 🎓</div>}
-       <button className="toggle-btn" onClick={toggleSidebar}>
-       {isCollapsed ? '☰' : '✕'}
-       </button>
-       </div>
+        <div className="sidebar-header">
+          {!isCollapsed && <div className="logo">Flow 🎓</div>}
+          <button className="toggle-btn" onClick={toggleSidebar}>
+            {isCollapsed ? '☰' : '✕'}
+          </button>
+        </div>
 
         <nav className="nav-menu">
-<div 
-  className="nav-item active" 
-  title="Mon Profil" onClick={() => navigate('/profile')} // <--- Redirige vers la page Profil
-  style={{ cursor: 'pointer' }}
->
-  <span className="icon">👤</span> {/* Tu peux changer l'icône par un avatar */}
-  {!isCollapsed && <span className="text">Mon Profil</span>}
-</div>
-
-           <div className="nav-item" onClick={() => setIsNotifOpen(true)} title="Notifications">
-             <span className="icon">🔔</span>
-             {!isCollapsed && <span className="text">Notifications</span>}
-             {nbNotifs > 0 && <span className="notif-count">{nbNotifs}</span>}
-           </div>
-<div className="nav-item" onClick={() => navigate('/adminsy')} title="Interface Admin">             <span className="icon">🛠️</span>
-             {!isCollapsed && <span className="text">Interface Admin</span>}
-           </div>
-
-          <div className="nav-item" onClick={() => navigate('/biblio')} title="Bibliothèque de fichiers">
-             <span className="icon">📚</span>
-             {!isCollapsed && <span className="text">Bibliothèque</span>}
+          {/* Profil */}
+          <div className="nav-item" onClick={() => navigate('/profile')}>
+            <span className="icon">👤</span>
+            {!isCollapsed && <span className="text">Mon Profil</span>}
           </div>
-          <div className="nav-item" onClick={() => setIsAgendaOpen(true)} title="agenda">
+
+          {/* Notifications avec badge */}
+          <div className="nav-item" onClick={() => setIsNotifOpen(true)}>
+            <span className="icon">🔔</span>
+            {!isCollapsed && <span className="text">Notifications</span>}
+            {nbNotifs > 0 && (
+              <span className="notif-count">
+                {nbNotifs > 99 ? '99+' : nbNotifs}
+              </span>
+            )}
+          </div>
+
+          {/* Admin */}
+          <div className="nav-item" onClick={() => navigate('/adminsy')}>
+            <span className="icon">🛠️</span>
+            {!isCollapsed && <span className="text">Interface Admin</span>}
+          </div>
+
+          {/* Bibliothèque */}
+          <div className="nav-item" onClick={() => navigate('/biblio')}>
+            <span className="icon">📚</span>
+            {!isCollapsed && <span className="text">Bibliothèque</span>}
+          </div>
+
+          {/* Agenda */}
+          <div className="nav-item" onClick={() => setIsAgendaOpen(true)}>
             <span className="icon">📅</span>
             {!isCollapsed && <span className="text">Agenda</span>}
           </div>
-          <div className="nav-item" onClick={() => setIsTodoOpen(true)} title="To-Do List">
+
+          {/* To-Do */}
+          <div className="nav-item" onClick={() => setIsTodoOpen(true)}>
             <span className="icon">✅</span>
             {!isCollapsed && <span className="text">To-Do List</span>}
           </div>
 
-             {/* Système de sélection LMD / Ingénieur */}
-    
+          {/* Groupes (cascade) */}
+          <div className="nav-item" onClick={() => !isCollapsed && setIsGroupeOpen(!isGroupeOpen)}>
+            <span className="icon">📁</span>
+            {!isCollapsed && (
+              <span className="text">
+                Groupes {isGroupeOpen ? '▼' : '▶'}
+              </span>
+            )}
+          </div>
 
-  {/* NIVEAU 1 : Rubrique Groupes */}
-<div className="nav-item" onClick={() => !isCollapsed && setIsGroupeOpen(!isGroupeOpen)}>
-  <span className="icon">📁</span>
-  {!isCollapsed && <span className="text">Groupes Existants {isGroupeOpen ? '▼' : '▶'}</span>}
-</div>
+          {!isCollapsed && isGroupeOpen && (
+            <div className="cascade-level-1">
+              {/* LMD */}
+              <div 
+                className={`nav-item sub-item ${selectedSystem === 'LMD' ? 'active' : ''}`}
+                onClick={() => setSelectedSystem(prev => prev === 'LMD' ? null : 'LMD')}
+              >
+                🎓 LMD
+              </div>
+              {selectedSystem === 'LMD' && (
+                <div className="cascade-level-2">
+                  {levels.LMD.map(lvl => (
+                    <button 
+                      key={lvl} 
+                      className="leaf-item"
+                      onClick={() => navigate(`/groupes/${lvl}`)}
+                    >
+                      {lvl}
+                    </button>
+                  ))}
+                </div>
+              )}
 
-  {!isCollapsed && isGroupeOpen && (
-    <div className="cascade-level-1">
-      {/* NIVEAU 2 : Systèmes */}
-      <div className={`nav-item ${selectedSystem === 'LMD' ? 'active' : ''}`} 
-           onClick={() => setSelectedSystem(selectedSystem === 'LMD' ? null : 'LMD')}>
-        🎓 LMD
-      </div>
-      
-      {isGroupeOpen && selectedSystem === 'LMD' && (
-        <div className="cascade-level-2">
-          {/* NIVEAU 3 : Niveaux LMD */}
-          {levels.LMD.map(lvl => (
-            <button key={lvl} className="leaf-item" onClick={() => window.location.href=`/groupes/${lvl}`}>
-              {lvl}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <div className={`nav-item ${selectedSystem === 'Ingenieur' ? 'active' : ''}`}
-           onClick={() => setSelectedSystem(selectedSystem === 'Ingenieur' ? null : 'Ingenieur')}>
-        ⚙️ Ingénieur
-      </div>
-
-      {isGroupeOpen && selectedSystem === 'Ingenieur' && (
-        <div className="cascade-level-2">
-          {/* NIVEAU 3 : Niveaux Ingénieur */}
-          {levels.Ingenieur.map(lvl => (
-            <button key={lvl} className="leaf-item" onClick={() => window.location.href=`/groupes/${lvl}`}>
-              {lvl}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )}
-
-
-
-
+              {/* Ingénieur */}
+              <div 
+                className={`nav-item sub-item ${selectedSystem === 'Ingenieur' ? 'active' : ''}`}
+                onClick={() => setSelectedSystem(prev => prev === 'Ingenieur' ? null : 'Ingenieur')}
+              >
+                ⚙️ Ingénieur
+              </div>
+              {selectedSystem === 'Ingenieur' && (
+                <div className="cascade-level-2">
+                  {levels.Ingenieur.map(lvl => (
+                    <button 
+                      key={lvl} 
+                      className="leaf-item"
+                      onClick={() => navigate(`/groupes/${lvl}`)}
+                    >
+                      {lvl}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </nav>
 
-        {/* POMODORO WIDGET */}
-{!isCollapsed && (
-  <div className="pomodoro-widget">
-    <div className="pomodoro-mode">
-      ⏱️ {mode === 'work' ? 'Travail' : 'Pause'}
-    </div>
-    <div className="pomodoro-timer">
-      {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
-    </div>
-    <div className="pomodoro-controls">
-      <button className="pomo-btn play" onClick={() => setIsActive(!isActive)}>
-        {isActive ? '⏸' : '▶'}
-      </button>
-      <button className="pomo-btn reset" onClick={() => {
-        setIsActive(false);
-        setTimeLeft(mode === 'work' ? 25 * 60 : 5 * 60);
-      }}>🔄</button>
-    </div>
-    <div className="pomodoro-cycles">
-      <button 
-        className={`cycle-btn ${timeLeft === 25*60 || timeLeft === 5*60 ? 'active-cycle' : ''}`}
-        onClick={() => { setTimerMode(25, 'work'); }}>
-        25 / 5
-      </button>
-      <button 
-        className={`cycle-btn`}
-        onClick={() => { setTimerMode(40, 'work'); }}>
-        40 / 20
-      </button>
-    </div>
-  </div>
-)}
+        {/* Pomodoro Widget */}
+        {!isCollapsed && (
+          <div className="pomodoro-widget">
+            <div className="pomodoro-mode">
+              ⏱️ {mode === 'work' ? 'Travail' : 'Pause'}
+            </div>
+            <div className="pomodoro-timer">
+              {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
+            </div>
+            <div className="pomodoro-controls">
+              <button className="pomo-btn play" onClick={() => setIsActive(!isActive)}>
+                {isActive ? '⏸' : '▶'}
+              </button>
+              <button className="pomo-btn reset" onClick={() => {
+                setIsActive(false);
+                setTimeLeft(mode === 'work' ? 25 * 60 : 5 * 60);
+              }}>
+                🔄
+              </button>
+            </div>
+            <div className="pomodoro-cycles">
+              <button 
+                className={`cycle-btn ${timeLeft === 25*60 ? 'active' : ''}`}
+                onClick={() => setTimerMode(25, 'work')}
+              >
+                25/5
+              </button>
+              <button 
+                className={`cycle-btn ${timeLeft === 40*60 ? 'active' : ''}`}
+                onClick={() => setTimerMode(40, 'work')}
+              >
+                40/20
+              </button>
+            </div>
+          </div>
+        )}
 
         <button className="logout-btn" onClick={handleLogout}>
           {isCollapsed ? '↪' : 'Se déconnecter'}
         </button>
       </aside>
 
-
-
-      {/* NOUVEAU WRAPPER : Navbar + Contenu Principal */}
+      {/* ========== CONTENU PRINCIPAL ========== */}
       <div className="main-wrapper">
-        {/* 2. NAVBAR HORIZONTALE */}
+        
+        {/* Navbar */}
         <nav className="top-navbar">
-         
-
           <div className="actions-section">
-<button 
-  className="btn-create" 
-  onClick={() => {
-    setIsModalOpen(true);
-  }}
->
-  + Créer un Groupe
-</button>   
-      {/* Dans ton bouton dark mode */}
+            <button className="btn-create" onClick={() => setIsModalOpen(true)}>
+              + Créer un Groupe
+            </button>
+            
             <button className="dark-mode-btn" onClick={toggleDarkMode}>
               {darkMode ? '☀️' : '🌙'}
-            </button>            <div className="user-profile">
+            </button>
+            
+            <div className="user-profile">
               <span>Salut, <strong>{nomClient}</strong></span>
             </div>
           </div>
         </nav>
 
-        {/* 3. CONTENU DES WIDGETS */}
+        {/* Main Content */}
         <main className="main-content">
-            {/* SECTION HERO STYLE STUDOCU */}
-    <section className="hero-section">
-      <h1>Apprenons ensemble</h1>
-      <p>Trouve les meilleurs groupes et documents pour ton cursus.</p>
-      
-<div className="search-container-hero">
-  <input 
-    type="text" 
-    placeholder="Recherche de groupes ou de documents..." 
-    className="hero-search-bar" 
-    value={searchTerm} // N'oublie pas de déclarer const [searchTerm, setSearchTerm] = useState(""); en haut
-onChange={(e) => {
-  const val = e.target.value;
-  setSearchTerm(val);
-  
-  if (val.length > 0) {
-    console.log("Tentative de fetch pour :", val);
-    
-    fetch(`http://localhost:5000/api/search-all?q=${encodeURIComponent(val)}`)
-      .then(res => {
-        if (!res.ok) throw new Error("Erreur serveur : " + res.status);
-        return res.json();
-      })
-      .then(data => {
-        console.log("Données reçues du serveur !", data);
-        setSearchResults(data);
-      })
-      .catch(err => {
-        console.error("Erreur Fetch détectée :", err);
-        // Si ça échoue, on met un faux résultat pour tester l'affichage
-        setSearchResults([{id: 0, title: "Erreur de connexion au serveur", type: "error"}]);
-      });
-  } else {
-    setSearchResults([]);
-  }
-}}
-  />
-  <button className="hero-search-btn">🔍</button>
+          
+          {/* Hero Section */}
+          <section className="hero-section">
+            <h1>Apprenons ensemble</h1>
+            <p>Trouve les meilleurs groupes et documents pour ton cursus.</p>
+            
+            <div className="search-container-hero">
+              <input
+                type="text"
+                placeholder="Recherche de groupes ou de documents..."
+                className="hero-search-bar"
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+              <button className="hero-search-btn">🔍</button>
+              
+              {/* Résultats de recherche */}
+              {searchResults.length > 0 && (
+                <div className="search-dropdown-results">
+                  {searchResults.map((result) => (
+                    <div
+                      key={`${result.type}-${result.id}`}
+                      className="search-item-row"
+                      onClick={() => handleSearchResultClick(result)}
+                    >
+                      <span className="type-icon">
+                        {result.type === 'groupe' ? '👥' : '📄'}
+                      </span>
+                      <span className="result-text">{result.title}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
 
-  {/* Affichage des résultats sous la barre */}
-{/* La liste magique qui transforme ton JSON en visuel */}
-{searchResults.length > 0 && (
-  <div className="search-dropdown-results">
-    {searchResults.map((result) => (
-      <div 
-        key={`${result.type}-${result.id}`} 
-        className="search-item-row"
-onClick={() => {
-  if(result.type === 'groupe') {
-    navigate(`/groupe/${result.id}`); 
-  } else {
-    navigate('/biblio'); 
-  }
-
-  setSearchTerm("");
-  setSearchResults([]);
-}}
-      >
-        <span className="type-icon">{result.type === 'groupe' ? '👥' : '📄'}</span>
-        <span className="result-text">{result.title}</span>
-      </div>
-    ))}
-  </div>
-)}
-</div>
-      </section>
-
-
-<div className='mes-groupes'>
+          {/* Mes Groupes */}
+<div className="mes-groupes">
   <span>👥 Mes groupes</span>
   <section className="groupes-list">
     {mesGroupes.length === 0 ? (
-      <p style={{color: 'var(--text-sub)', padding: '1rem'}}>
-        Vous n'appartenez à aucun groupe pour le moment.
-      </p>
+      <p>Vous n'appartenez à aucun groupe pour le moment.</p>
     ) : (
       mesGroupes.map(groupe => (
-        <div key={groupe.id_groupe} className="w33 card groupe-card">
-          
-          {/* TITRE + BADGE ADMIN DISCRET */}
+        <div key={groupe.id_groupe} className="groupe-card">
           <h3>
-            {groupe.nom_groupe} 
+            {groupe.nom_groupe}
             {groupe.id_etudiant == userId && (
-              <span className="admin-inline-badge"> (Admin)</span>
+              <span className="admin-inline-badge">Admin</span>
             )}
           </h3>
-
-          {/* DESCRIPTION RÉCUPÉRÉE DU CREATEGROUP */}
           <p className="groupe-description">
             {groupe.description || "Pas de description."}
           </p>
-
-          {/* BOUTON UNIQUE "OUVRIR" */}
           <button 
             className="btn-small"
             onClick={() => navigate(`/groupe/${groupe.id_groupe}`)}
           >
-            Ouvrir
+            Ouvrir →
           </button>
         </div>
       ))
@@ -422,18 +464,25 @@ onClick={() => {
   </section>
 </div>
 
-
         </main>
+
+           <Footer />
+   
       </div>
+
+      {/* ========== MODALS ========== */}
       {isModalOpen && <CreateGroup closeModal={() => setIsModalOpen(false)} />}
       {isTodoOpen && <TodoModal closeModal={() => setIsTodoOpen(false)} />}
-      {isNotifOpen && <NotifModal closeModal={() => setIsNotifOpen(false)} />}
-        {isAgendaOpen && <Agenda closeModal={() => setIsAgendaOpen(false)} />}
+      {isAgendaOpen && <Agenda closeModal={() => setIsAgendaOpen(false)} />}
+      
+      {isNotifOpen && (
+        <NotifModal 
+          closeModal={() => setIsNotifOpen(false)} 
+          onNotifsRead={refreshNotifCount} // ✅ Rafraîchit le badge
+        />
+      )}
     </div>
-
-    
   );
-
 };
 
 export default Home;

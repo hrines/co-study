@@ -1,65 +1,115 @@
 import React, { useEffect, useState } from 'react';
 import './NotifModal.css';
 
-const NotifModal = ({ closeModal }) => {
-const [notifications, setNotifications] = useState([]);
-const user = JSON.parse(localStorage.getItem('user'));
-const userId = user ? user.id_etudiant : null;
-const token = localStorage.getItem('token');
+const NotifModal = ({ closeModal, onNotifsRead }) => {
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  // ✅ Récupération SÉCURISÉE de userId et token
+  const getUserIdAndToken = () => {
+    let userId = null;
+    let token = localStorage.getItem('token');
+    
+    // Méthode 1 : via localStorage.getItem('userId')
+    userId = localStorage.getItem('userId');
+    
+    // Méthode 2 : via parsing de l'objet user
+    if (!userId) {
+      try {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          userId = user?.id_etudiant || user?.id;
+        }
+      } catch (e) {
+        console.warn("⚠️ Impossible de parser user:", e);
+      }
+    }
+    
+    // Méthode 3 : via décodage du token JWT
+    if (!userId && token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        userId = payload.id || payload.userId || payload.id_etudiant;
+      } catch (e) {
+        console.warn("⚠️ Impossible de décoder token:", e);
+      }
+    }
+    
+    console.log("🔍 NotifModal - userId:", userId, "token:", token ? 'présent' : 'absent');
+    return { userId, token };
+  };
+  
+  const { userId, token } = getUserIdAndToken();
 
   // Charger les notifications
-useEffect(() => {
-        if (!userId || !token) return;
+  useEffect(() => {
+    console.log("📡 NotifModal useEffect - userId:", userId, "token:", token ? 'OK' : 'MANQUANT');
+    
+    if (!userId || !token) {
+      console.error("❌ Impossible de charger les notifs: userId ou token manquant");
+      setLoading(false);
+      return;
+    }
 
-        fetch(`http://localhost:5000/api/notifications/${userId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (Array.isArray(data)) {
-                setNotifications(data);
-            } else {
-                setNotifications([]);
-            }
-        })
-        .catch(err => {
-            console.error("Erreur fetch notifications:", err);
-            setNotifications([]);
-        });
-    }, [userId, token]);
+    fetch(`http://localhost:5000/api/notifications/${userId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(async res => {
+      console.log("📦 Réponse serveur - status:", res.status);
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error("❌ Erreur HTTP:", res.status, errText);
+        throw new Error(`Erreur ${res.status}: ${errText}`);
+      }
+      return res.json();
+    })
+    .then(data => {
+      console.log("✅ Notifications reçues:", data?.length || 0, "items");
+      if (Array.isArray(data)) {
+        setNotifications(data);
+      } else {
+        console.warn("⚠️ Réponse non-array:", data);
+        setNotifications([]);
+      }
+    })
+    .catch(err => {
+      console.error("❌ Erreur fetch notifications:", err.message);
+      setNotifications([]);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+  }, [userId, token]);
 
 // Marquer tout comme lu
-    const toutLire = async () => {
-        try {
-            await fetch(`http://localhost:5000/api/notifications/lire-tout/${userId}`, { 
-                method: 'PUT',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            setNotifications([]); 
-        } catch (err) {
-            console.error("Erreur toutLire:", err);
-        }
-    };
-
+  const toutLire = async () => {
+    try {
+      await fetch(`http://localhost:5000/api/notifications/lire-tout/${userId}`, { 
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setNotifications([]);
+      if (onNotifsRead) onNotifsRead(); // ✅ Rafraîchir le badge
+    } catch (err) {
+      console.error("Erreur toutLire:", err);
+    }
+  };
 
 // Accepter une demande
-const accepter = async (idDemande, idNotif) => {
-  try {
-    // 1. Appel API pour accepter l'adhésion
-    await fetch(`http://localhost:5000/api/demande-adhesion/${idDemande}/accepter`, { method: 'PUT' });
-    
-    // 2. Appel API pour marquer la notif comme lue en BDD
-    await fetch(`http://localhost:5000/api/notifications/${idNotif}/lu`, { method: 'PUT' });
-    
-    // 3. MISE À JOUR LOCALE : On retire la notification de la liste
-    // Au lieu de mettre .map(...), on utilise .filter
-    setNotifications(prevNotifs => prevNotifs.filter(n => n.id !== idNotif));
-    
-    alert('Demande acceptée !');
-  } catch (err) {
-    console.error("Erreur acceptation:", err);
-  }
-};
+  const accepter = async (idDemande, idNotif) => {
+    try {
+      await fetch(`http://localhost:5000/api/demande-adhesion/${idDemande}/accepter`, { method: 'PUT' });
+      await fetch(`http://localhost:5000/api/notifications/${idNotif}/lu`, { method: 'PUT' });
+      setNotifications(prev => prev.filter(n => n.id !== idNotif));
+      if (onNotifsRead) onNotifsRead(); // ✅ Rafraîchir le badge
+      alert('Demande acceptée !');
+    } catch (err) {
+      console.error("Erreur acceptation:", err);
+    }
+  };
+
+
 // Refuser une demande
 const refuser = async (idDemande, idNotif) => {
   try {
@@ -74,6 +124,19 @@ const refuser = async (idDemande, idNotif) => {
   }
 };
   const nonLues = notifications.filter(n => n.lu === 0).length;
+
+
+
+
+  const getNotifIcon = (type) => {
+  switch(type) {
+    case 'adhesion': return '👥';
+    case 'accepte': return '✅';
+    case 'refuse': return '❌'; // ← Nouvelle icône pour les refus
+    case 'groupe_valide': return '🎉';
+    default: return '🔔';
+  }
+};
 
   return (
     <div className="modal-overlay">
@@ -92,8 +155,9 @@ const refuser = async (idDemande, idNotif) => {
           ) : (
             notifications.map(notif => (
               <div key={notif.id} className={`notif-item ${notif.lu === 0 ? 'non-lue' : ''}`}>
-                <div className="notif-message">{notif.message}</div>
-                <div className="notif-date">
+<div className="notif-message">
+  <span className="notif-icon">{getNotifIcon(notif.type)}</span> {notif.message}
+</div>                <div className="notif-date">
                   {new Date(notif.created_at).toLocaleDateString('fr-FR', {
                     day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
                   })}

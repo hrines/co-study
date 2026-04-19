@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap'; // Import manquant ajouté
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './LandingPage.css';
+import Footer from './footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -140,6 +141,8 @@ const LandingPage = () => {
           <p className="sub-text">Rejoignez les étudiants de l'Université d'Oran 1</p>
         </div>
       </section>
+
+      <Footer />
 
 
     </div>
