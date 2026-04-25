@@ -1,3 +1,7 @@
+/* ============================================================
+   CO'STUDY ADMIN - STYLE COMPLET (REM & %)
+   ============================================================ */
+
 * {
   margin: 0;
   padding: 0;
@@ -5,90 +9,318 @@
 }
 
 :root {
-  /* Ta nouvelle palette Co'study */
-  --gris-fond: #EFEFEF;    /* Le gris clair de ton image */
-  --blanc: #ffffff;
-  --bleu-fonce: #112B3C;   /* Le bleu très foncé (haut de l'image) */
-  --bleu-moyen: #205375;   /* Le bleu intermédiaire */
-  --orange-accent: #F66B0E; /* L'orange vif pour les boutons */
-  
-  /* Variables de texte et structure */
+  --gris-fond: #F4F7F9;
+  --blanc: #FFFFFF;
+  --bleu-fonce: #112B3C;
+  --bleu-moyen: #205375;
+  --orange-accent: #F66B0E;
+
   --text-main: #112B3C;
-  --text-sub: #546e7a;     /* Un gris-bleu qui va bien avec ta palette */
-  --border-color: #cfd8dc;
-  --shadow: 0 0.4rem 1.2rem rgba(17, 43, 60, 0.1);
-  --transition: all 0.3s ease;
+  --text-sub: #546E7A;
+  --border-color: #D1D9E0;
+  --shadow: 0 0.25rem 0.9375rem rgba(17, 43, 60, 0.08);
+  --transition: all 0.2s ease-in-out;
 }
 
-body.dark {
-  /* --- Palette Fond (Tes codes Freepik) --- */
-  --bleu-fonce: #112B3C;      /* Un bleu pétrole très foncé pour le mode sombre */
-  --blanc: #205375;          /* Le bleu très foncé devient blanc en mode sombre */
-  --gris-fond: #205375;      /* Le bleu pétrole foncé (Fond d'écran principal) */
-  
-  /* --- Palette Texte --- */
-  --text-main: #FFFFFF;      /* Blanc pur pour les titres */
-  --text-sub: #EFEFEF;       /* Blanc cassé/gris très clair (Descriptions, Textes secondaires) */
-  
-  /* --- Accents & Interactions --- */
-  --accent-color: #F66B0E;   /* Ton Orange Co'study (Logo, Bouton Créer) */
-  --border-color: #5584A5;   /* Bleu clair acier (Bordures discrètes) */
-  --hover-color: #2C6E91;    /* Bleu légèrement plus clair pour le survol */
-}
-
-/* --- Ajustement du relief pour la Sidebar --- */
-body.dark .sidebar {
-  background-color: var(--bleu-fonce); /* Utilise le bleu acier moyen pour se détacher du fond */
-  border-right: 0.5px solid var(--border-color);
-}
-
-
-/* --- Ajustement du relief pour les Cartes (lorsqu'il y en aura) --- */
-body.dark .card,
-body.dark .groupe-card {
-  background-color: var(--blanc); /* Cartes acier sur fond pétrole */
-  border: 1px solid var(--border-color);
+body {
+  background-color: var(--gris-fond);
   color: var(--text-main);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2); /* Ombre légère pour décoller */
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
 }
 
-
-
-
-/* --- Ajustement de la Barre de recherche (Hero) --- */
-body.dark .hero-search-bar {
-  background-color: #0C1E2A; /* Une version très sombre du pétrole */
-  color: white;
-  border: 1px solid var(--border-color);
+/* --- LAYOUT PRINCIPAL (FLEXBOX SANS BUG) --- */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
 }
 
-
-/* Règle de secours pour la lisibilité */
-body.dark .nav-item .text, 
-body.dark .logo, 
-body.dark .sidebar-header {
-  color: #FFFFFF;
+/* --- SIDEBAR (STICKY AU LIEU DE FIXED) --- */
+.admin-sidebar {
+  width: 16.25rem; /* ~260px */
+  min-width: 18%;
+  background-color: #0f172a;
+  color: #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  box-shadow: 0.25rem 0 0.9375rem rgba(0, 0, 0, 0.1);
+  z-index: 10;
 }
 
-body.dark input {
-    background-color: #0f172a;
-    color: white;
-    border: 1px solid var(--border-color);
+.admin-logo {
+  padding: 1.875rem 1.25rem;
+  font-size: 1.375rem;
+  font-weight: 800;
+  color: #38bdf8;
+  text-align: center;
+  border-bottom: 0.0625rem solid #1e293b;
 }
 
-body.dark input::placeholder {
-    color: var(--text-sub);
+.admin-nav {
+  flex: 1;
+  padding: 0.625rem;
 }
-.auth-btn, .cta-orange {
-  background-color: var(--orange-accent);
-  color: white;
-  border: none;
+
+/* Navigation & Menus */
+.menu-header, .menu-sub-header, .niveaux-list li {
+  padding: 0.75rem 0.9375rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
   transition: var(--transition);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  color: #cbd5e1;
 }
 
-.auth-btn:hover {
-  filter: brightness(1.1); /* Ça l'éclaircit un peu au survol */
-  transform: translateY(-2px);
+.menu-header:hover, .menu-sub-header:hover, .niveaux-list li:hover {
+  background-color: #1e293b;
+  color: #38bdf8;
 }
 
+.niveaux-list li.active-niv {
+  background: #38bdf8;
+  color: #ffffff !important;
+  box-shadow: 0 0.25rem 0.625rem rgba(56, 189, 248, 0.3);
+}
 
+.cursus-container {
+  margin-left: 0.9375rem;
+  border-left: 0.0625rem dashed #334155;
+  padding-left: 0.625rem;
+}
+
+.niveaux-list {
+  list-style: none;
+  padding: 0.3125rem 0 0.625rem 1.5625rem;
+}
+
+/* --- CONTENU PRINCIPAL --- */
+.admin-main {
+  flex: 1;
+  padding: 2rem 3rem;
+  overflow-y: auto;
+  background-color: var(--gris-fond);
+}
+
+.content-header h1 {
+  font-size: 1.625rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--bleu-fonce);
+}
+
+/* --- NOTIFICATIONS --- */
+.notification-center {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.notif-item {
+  font-size: 0.8125rem;
+  padding: 0.5rem 1rem;
+  background: var(--blanc);
+  border-radius: 3.125rem;
+  border: 0.0625rem solid var(--border-color);
+  color: var(--text-sub);
+  box-shadow: var(--shadow);
+}
+
+.notif-item.urgent {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #e11d48;
+}
+
+/* --- BOUTONS DE NAVIGATION --- */
+.navigation-menu {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.9375rem;
+  padding: 1.25rem;
+  background: var(--blanc);
+  border: 0.125rem solid transparent;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow);
+  color: var(--text-sub);
+  text-align: left;
+}
+
+.nav-btn:hover {
+  transform: translateY(-0.25rem);
+  box-shadow: 0 0.625rem 1rem rgba(0, 0, 0, 0.1);
+  border-color: var(--border-color);
+}
+
+.nav-btn.active {
+  background: #38bdf8;
+  color: var(--blanc);
+  box-shadow: 0 0.625rem 1.25rem rgba(56, 189, 248, 0.3);
+}
+
+.nav-btn-icon {
+  font-size: 1.75rem;
+  min-width: 2.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.nav-btn-text { display: flex; flex-direction: column; gap: 0.25rem; }
+.nav-btn-title { font-size: 1rem; font-weight: 700; }
+.nav-btn-count { font-size: 0.75rem; opacity: 0.8; }
+
+/* --- ZONE DE GESTION --- */
+.admin-sections-container {
+  background: var(--blanc);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  min-height: 25rem;
+  border: 0.0625rem solid var(--border-color);
+  width: 100%;
+}
+
+.welcome-admin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.welcome-admin h2 {
+  font-size: 1.5rem;
+  color: var(--bleu-fonce);
+}
+
+/* --- TABLEAUX --- */
+.table-container {
+  background: var(--blanc);
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 0.0625rem solid var(--border-color);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table thead {
+  background-color: var(--bleu-fonce);
+  color: var(--blanc);
+}
+
+.data-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.data-table td {
+  padding: 1rem;
+  border-bottom: 0.0625rem solid var(--border-color);
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+.data-table tbody tr:hover { background-color: var(--gris-fond); }
+
+/* --- BADGES & ACTIONS --- */
+.badge {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.badge.en_attente { background: rgba(246, 107, 14, 0.1); color: var(--orange-accent); }
+.badge.valide, .badge.active { background: rgba(32, 83, 117, 0.1); color: var(--bleu-moyen); }
+.badge.refuse { background: rgba(255, 71, 87, 0.1); color: #ff4757; }
+
+.actions-cell { display: flex; gap: 0.5rem; justify-content: center; }
+
+.btn-icon {
+  border: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  background: var(--gris-fond);
+  color: var(--text-sub);
+}
+
+.btn-icon:hover { transform: translateY(-0.15rem); box-shadow: var(--shadow); }
+.btn-icon.validate { background: rgba(32, 83, 117, 0.15); color: var(--bleu-moyen); }
+.btn-icon.validate:hover { background: var(--bleu-moyen); color: white; }
+.btn-icon.refuse, .btn-icon.delete-group { background: rgba(255, 71, 87, 0.15); color: #ff4757; }
+.btn-icon.refuse:hover, .btn-icon.delete-group:hover { background: #ff4757; color: white; }
+
+/* --- MODALS --- */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(17, 43, 60, 0.6);
+  backdrop-filter: blur(0.25rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-content {
+  background: var(--blanc);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 31.25rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.2);
+}
+
+.modal-header { display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 0.0625rem solid var(--border-color); padding-bottom: 0.5rem; }
+.modal-close { background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--text-sub); }
+.modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; }
+
+/* --- RESPONSIVE --- */
+@media (max-width: 60rem) {
+  .admin-sidebar { width: 20%; min-width: 12rem; }
+  .admin-main { padding: 1.5rem; }
+  .navigation-menu { grid-template-columns: 1fr; }
+  .notification-center { flex-direction: column; }
+}
+
+@media (max-width: 48rem) {
+  .admin-layout { flex-direction: column; }
+  .admin-sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 0.0625rem solid var(--border-color); }
+  .admin-main { padding: 1rem; }
+  .data-table { display: block; overflow-x: auto; white-space: nowrap; }
+}

@@ -76,9 +76,13 @@ const Profile = () => {
               <span className="info-label">Statut</span>
               <p className="info-value">Actif</p>
             </div>
+            <div className="info-box">
+              <span className="info-label">ID Étudiant</span>
+              <p className="info-value">{profileData.id_etudiant}</p>
+            </div>
           </div>
 
-          <h3 className="section-title mt-4">Statistiques Flow</h3>
+          <h3 className="section-title mt-4">Statistiques Co'study</h3>
           <div className="stats-container">
             <div className="stat-card">
               <span className="stat-number">{profileData.nb_crees}</span>

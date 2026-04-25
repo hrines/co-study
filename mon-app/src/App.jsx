@@ -4,44 +4,41 @@ import Authentification from './auth';
 import './App.css';
 import GroupePage from './GroupePage';
 import GroupesList from './GroupesList';
-import Profile from './profile';       // <-- AJOUTÉ
-import CreateGroup from './CreateGroup'; // <-- AJOUTÉ
+import Profile from './profile';
+import CreateGroup from './CreateGroup';
 import Biblio from './biblio';
 import AdminSy from './adminsy';
 import LandingPage from './LandingPage';
 import Agenda from './agenda';
+import ForgotPassword from './ForgotPassword';
+
+// ✅ PLUS BESOIN DE ProtectedRoute ni Dashboard
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Page d'accueil (landing page) */ }
+        {/* Page d'accueil */}
         <Route path="/" element={<LandingPage />} />
+        
         {/* Pages d'authentification */}
         <Route path="/login" element={<Authentification />} />
         <Route path="/signup" element={<Authentification />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         
-        {/* Pages principales */}
+        {/* Routes protégées - Accès direct (la vérif se fait dans le login) */}
+        <Route path="/admin" element={<AdminSy />} />
         <Route path="/home" element={<Home />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/create-group" element={<CreateGroup />} />
         <Route path="/agenda" element={<Agenda />} />
-        
-        {/* Pages de groupes */}
         <Route path="/groupe/:id" element={<GroupePage />} />
         <Route path="/groupes/:niveau" element={<GroupesList />} />
-        {/* Bibliothèque de fichiers */}  
         <Route path="/biblio" element={<Biblio />} />
-        {/* Admin Système */}
-        <Route path="/adminsy" element={<AdminSy />} />
-
-        {/* Redirection par défaut : si l'URL ne correspond à rien, on va au login */}
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="*" element={<Authentification />} />
-
-
-
+        <Route path="/adminsy" element={<Navigate to="/admin" replace />} />
         
+        {/* Redirection par défaut */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );

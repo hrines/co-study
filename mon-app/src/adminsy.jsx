@@ -34,29 +34,29 @@ import GestionFichiers from './GestionFichiers';
 
 
 
-useEffect(() => {
-  if (selection.niveau && selection.filiere) {
-    fetch(`http://localhost:5000/api/admin/stats/${selection.filiere}/${selection.niveau}`)
-      .then(res => res.json())
-      .then(data => {
-        setStats({
-          fichiers: data.fichiersEnAttente || 0,
-          membres: data.totalEtudiants || 0,
-          groupes: data.groupesEnAttente || 0
-        });
-      })
-      .catch(err => {
-        // Garde juste cette erreur silencieuse
-        console.error("Stats error:", err);
-      });
-  }
-}, [selection]);
+  useEffect(() => {
+    if (selection.niveau && selection.filiere) {
+      // On ajoute un timestamp pour forcer le rechargement si besoin
+      const url = `http://localhost:5000/api/admin/stats/${selection.filiere}/${selection.niveau}?t=${Date.now()}`;
+      
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          setStats({
+            fichiers: data.fichiersEnAttente || 0,
+            membres: data.totalEtudiants || 0,
+            groupes: data.groupesEnAttente || 0
+          });
+        })
+        .catch(err => console.error("Stats error:", err));
+    }
+  }, [selection]); // Dépendance correcte
 
   return (
     <div className="admin-layout">
       {/* SIDEBAR GAUCHE */}
       <aside className="admin-sidebar">
-        <div className="admin-logo">Flow Admin</div>
+        <div className="admin-logo">Co'study Admin</div>
         <nav className="admin-nav">
           {Object.keys(structures).map(filiere => (
             <div key={filiere} className="filiere-block">
@@ -106,12 +106,6 @@ useEffect(() => {
         <h1>{selection.filiere} &gt; {selection.cursus} {selection.niveau}</h1>
       </header>
 
-      {/* 1. CENTRE DE NOTIFICATIONS (Lecture seule) */}
-      <div className="notification-center">
-        <div className="notif-item urgent">🔔 {stats.fichiers} nouveaux fichiers</div>
-        <div className="notif-item">🔔 {stats.groupes} demandes de groupes</div>
-        <div className="notif-item">🔔 {stats.membres} nouveaux inscrits</div>
-      </div>
 
       {/* 2. BOUTONS DE NAVIGATION (Les accès aux fichiers) */}
 <div className="navigation-menu">
@@ -122,7 +116,6 @@ useEffect(() => {
     <span className="nav-btn-icon">👥</span>
     <div className="nav-btn-text">
       <span className="nav-btn-title">Gérer les Membres</span>
-      <span className="nav-btn-count">{stats.membres} membres inscrits</span>
     </div>
   </button>
 
@@ -133,18 +126,16 @@ useEffect(() => {
     <span className="nav-btn-icon">💬</span>
     <div className="nav-btn-text">
       <span className="nav-btn-title">Gérer les Groupes</span>
-      <span className="nav-btn-count">{stats.groupes} groupes créés</span>
     </div>
   </button>
 
   <button 
-    className={`nav-btn ${ongletActif === 'fichiers' ? 'active-tab' : ''}`}
+    className={`nav-btn ${ongletActif === 'fichiers' ? 'active' : ''}`}
     onClick={() => setOngletActif('fichiers')}
   >
     <span className="nav-btn-icon">📄</span>
     <div className="nav-btn-text">
       <span className="nav-btn-title">Gérer les Fichiers</span>
-      <span className="nav-btn-count">{stats.fichiers} fichiers au total</span>
     </div>
   </button>
 </div>

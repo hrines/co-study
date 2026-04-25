@@ -114,3 +114,41 @@
 
 .btn-accepter:hover { background: var(--vert-fonce); }
 .btn-refuser:hover { background: #d32f2f; }
+
+
+
+/* Style du message de notification */
+.notif-message {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.notif-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+/* Style spécifique pour le motif de refus */
+.notif-motif {
+  background: rgba(255, 71, 87, 0.1);
+  padding: 0.5rem 0.8rem;
+  border-radius: 0.4rem;
+  border-left: 0.2rem solid #ff4757;
+  font-size: 0.85rem;
+  color: #555;
+  margin-top: 0.3rem;
+}
+
+.notif-motif strong {
+  color: #ff4757;
+  font-weight: 700;
+}
+
+/* Icône de notification */
+.notif-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}

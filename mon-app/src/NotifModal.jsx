@@ -128,12 +128,14 @@ const refuser = async (idDemande, idNotif) => {
 
 
 
-  const getNotifIcon = (type) => {
+const getNotifIcon = (type) => {
   switch(type) {
     case 'adhesion': return '👥';
     case 'accepte': return '✅';
-    case 'refuse': return '❌'; // ← Nouvelle icône pour les refus
+    case 'refuse': return '❌';
     case 'groupe_valide': return '🎉';
+    case 'groupe_supprime': return '🗑️'; // ✅ Nouveau
+    case 'seance_revision': return '📅'; // ✅ Nouveau
     default: return '🔔';
   }
 };
@@ -156,7 +158,15 @@ const refuser = async (idDemande, idNotif) => {
             notifications.map(notif => (
               <div key={notif.id} className={`notif-item ${notif.lu === 0 ? 'non-lue' : ''}`}>
 <div className="notif-message">
-  <span className="notif-icon">{getNotifIcon(notif.type)}</span> {notif.message}
+  <span className="notif-icon">{getNotifIcon(notif.type)}</span>
+  <div className="notif-text">
+    {notif.message.split('\n')[0]} {/* Première ligne */}
+    {notif.message.includes('Motif :') && (
+      <div className="notif-motif">
+        <strong>Motif :</strong> {notif.message.split('Motif :')[1]}
+      </div>
+    )}
+  </div>
 </div>                <div className="notif-date">
                   {new Date(notif.created_at).toLocaleDateString('fr-FR', {
                     day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './GroupePage.css';
-import { useTheme } from './ThemeContext';
 import { io } from 'socket.io-client';
 
 // Initialisation de Socket.io (une seule fois, hors du composant)
@@ -10,7 +9,6 @@ const socket = io('http://localhost:5000');
 const GroupePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { darkMode, toggleDarkMode } = useTheme();
   
   // Récupération sécurisée des infos utilisateur
   const nomClient = localStorage.getItem("userName");
@@ -45,16 +43,20 @@ const GroupePage = () => {
   const [estMembre, setEstMembre] = useState(false);
   const [estCreateur, setEstCreateur] = useState(false);
   
-  // États UI
   const [showMenu, setShowMenu] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [newMemberId, setNewMemberId] = useState('');
   const [isMuted, setIsMuted] = useState(false);
+
+  const [seances, setSeances] = useState([]);
+  const [showSeanceModal, setShowSeanceModal] = useState(false);
+  const [newSeance, setNewSeance] = useState({ titre: '', description: '', date_seance: '', lieu: '' });
   
   const menuRef = useRef(null);
+  const messagesEndRef = useRef(null); // ✅ Pour l'auto-scroll
 
   // ==========================================
-  // HANDLERS SOCKET (mémorisés avec useCallback)
+  // HANDLERS SOCKET
   // ==========================================
   const onLoadMessages = useCallback((anciens) => {
     setMessages(anciens.map(m => ({
@@ -65,14 +67,12 @@ const GroupePage = () => {
 
   const onReceiveMessage = useCallback((data) => {
     setMessages(prev => {
-      // ✅ Éviter les doublons : ignorer si le message existe déjà
       if (prev.some(m => m.id === data.id)) return prev;
-
       return [...prev, {
         ...data,
         heure: new Date(data.created_at || Date.now()).toLocaleTimeString('fr-FR', { 
-          hour: '2-digit', 
-          minute: '2-digit' })
+          hour: '2-digit', minute: '2-digit' 
+        })
       }];
     });
   }, []);
@@ -89,6 +89,11 @@ const GroupePage = () => {
     }
   }, [userId, navigate]);
 
+  // Scroll automatique vers le bas
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   // ==========================================
   // CHARGEMENT INITIAL + SOCKET
   // ==========================================
@@ -100,20 +105,15 @@ const GroupePage = () => {
 
     console.log("📥 GroupePage chargé - Groupe ID:", id, "User ID:", userId);
 
-    // 1. Rejoindre le canal Socket pour ce groupe
     socket.emit('join_group', id);
-
-    // 2. Charger les infos du groupe
     chargerGroupe();
+    chargerSeances();
 
-    // 3. Ajout des écouteurs Socket
     socket.on('load_messages', onLoadMessages);
     socket.on('receive_message', onReceiveMessage);
     socket.on('group_deleted', onGroupDeleted);
     socket.on('user_kicked', onUserKicked);
 
-    // ✅ NETTOYAGE : retire TOUS les listeners de ces événements
-    // (sans passer la référence de callback, plus fiable)
     return () => {
       socket.off('load_messages');
       socket.off('receive_message');
@@ -133,6 +133,11 @@ const GroupePage = () => {
     return () => document.removeEventListener("mousedown", closeMenu);
   }, []);
 
+  // Auto-scroll quand les messages changent
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   // ==========================================
   // FONCTIONS DE CHARGEMENT
   // ==========================================
@@ -150,7 +155,6 @@ const GroupePage = () => {
       setGroupe(data);
       setMembres(data.membres || []);
       
-      // Vérifier les droits
       if (userId) {
         const estLeCreateur = Number(data.id_etudiant) === Number(userId);
         const estLeMembre = data.membres?.some(m => Number(m.id) === Number(userId));
@@ -164,7 +168,6 @@ const GroupePage = () => {
           return;
         }
       }
-      
     } catch (err) {
       console.error("❌ Erreur chargement groupe:", err);
       navigate('/home');
@@ -173,14 +176,10 @@ const GroupePage = () => {
     }
   }, [id, userId, navigate]);
 
-  // Fallback : charger les messages via HTTP si Socket met trop de temps
   const chargerMessages = useCallback(async () => {
     if (!id) return;
-    
     try {
-      // ✅ Ne charger que si aucun message n'est déjà présent
       if (messages.length > 0) return;
-      
       const response = await fetch(`http://localhost:5000/api/messages/${id}`);
       if (response.ok) {
         const data = await response.json();
@@ -194,6 +193,17 @@ const GroupePage = () => {
     }
   }, [id, messages.length]);
 
+  const chargerSeances = useCallback(async () => {
+    if (!id) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/groupes/${id}/seances`);
+      const data = await res.json();
+      setSeances(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("❌ Erreur chargement séances:", err);
+    }
+  }, [id]);
+
   // ==========================================
   // ACTIONS MESSAGES
   // ==========================================
@@ -201,20 +211,14 @@ const GroupePage = () => {
     e.preventDefault();
     if (!newMessage.trim() || !userId) return;
 
-
     const messageData = {
-
       auteur: nomClient || 'Anonyme',
       texte: newMessage,
       groupId: id,
       created_at: new Date()
     };
 
-    // Envoi via Socket.io (temps réel)
     socket.emit('send_message', messageData);
-    
-
-    
     setNewMessage('');
   };
 
@@ -227,12 +231,9 @@ const GroupePage = () => {
       });
       
       if (response.ok) {
-        // Mettre à jour localement
         setMessages(prev => prev.map(m => 
           m.id === messageId ? { ...m, est_epinglé: m.est_epinglé ? 0 : 1 } : m
         ));
-        
-        // Notifier le serveur pour broadcast aux autres
         socket.emit('message_pinned_updated', { messageId, groupId: id });
       }
     } catch (err) {
@@ -261,7 +262,6 @@ const GroupePage = () => {
       });
 
       if (response.ok) {
-        // Notifier les autres clients via le serveur
         socket.emit('group_deleted', id);
         navigate('/home', { replace: true });
       } else {
@@ -280,16 +280,13 @@ const GroupePage = () => {
       const response = await fetch(`http://localhost:5000/api/groupe/${id}/membres`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          idEtudiantAjoute: newMemberId,
-          idAdmin: userId 
-        })
+        body: JSON.stringify({ idEtudiantAjoute: newMemberId, idAdmin: userId })
       });
       
       if (response.ok) {
         alert("✅ Membre ajouté !");
         setNewMemberId('');
-        chargerGroupe(); // Recharger la liste
+        chargerGroupe();
       } else {
         const data = await response.json();
         alert("Erreur: " + (data.message || "Impossible d'ajouter ce membre"));
@@ -313,9 +310,7 @@ const GroupePage = () => {
       });
 
       if (response.ok) {
-        // Mise à jour locale immédiate
         setMembres(prev => prev.filter(m => Number(m.id) !== Number(memberId)));
-        // ✅ CORRECTION : Utiliser socket.emit() pour demander au serveur de notifier
         socket.emit('user_kicked', { groupId: id, kickedId: memberId });
         alert("✅ Membre retiré");
       } else {
@@ -348,6 +343,38 @@ const GroupePage = () => {
     } catch (err) {
       console.error("❌ Erreur demande adhésion:", err);
       alert("Erreur lors de la demande");
+    }
+  };
+
+  const annoncerSeance = async (e) => {
+    e.preventDefault();
+    if (!newSeance.titre || !newSeance.date_seance) {
+      alert("Titre et date sont obligatoires !");
+      return;
+    }
+    
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`http://localhost:5000/api/groupes/${id}/seances`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(newSeance)
+      });
+      
+      if (res.ok) {
+        alert("✅ Séance annoncée ! Tous les membres ont été notifiés.");
+        setShowSeanceModal(false);
+        setNewSeance({ titre: '', description: '', date_seance: '', lieu: '' });
+        chargerSeances();
+      } else {
+        const data = await res.json();
+        alert("Erreur: " + data.message);
+      }
+    } catch (err) {
+      alert("Erreur de connexion");
     }
   };
 
@@ -387,15 +414,11 @@ const GroupePage = () => {
         </div>
 
         <div className="header-right" ref={menuRef}>
-          <button className="dark-mode-btn" onClick={toggleDarkMode}>
-            {darkMode ? '☀️' : '🌙'}
-          </button>
           
           <button className="menu-dots" onClick={() => setShowMenu(!showMenu)}>⋮</button>
           
           {showMenu && (
             <div className="dropdown-chat-menu">
-              {/* Options pour tous */}
               <button className="menu-item" onClick={() => setIsMuted(!isMuted)}>
                 <span>{isMuted ? '🔔' : '🔕'}</span>
                 {isMuted ? 'Activer les notifications' : 'Désactiver les notifications'}
@@ -407,15 +430,15 @@ const GroupePage = () => {
                 </button>
               )}
 
-              {/* Section Admin */}
               {estCreateur && (
                 <>
                   <div className="admin-divider">⚙️ Administration</div>
-                  
+                  <button className="menu-item" onClick={() => { setShowSeanceModal(true); setShowMenu(false); }}>
+                    <span>📅</span> Annoncer une séance
+                  </button>
                   <button className="menu-item" onClick={() => { setShowModal(true); setShowMenu(false); }}>
                     <span>👥</span> Gérer les membres ({membres.length})
                   </button>
-                  
                   <button className="menu-item danger" onClick={handleDeleteGroup}>
                     <span>🗑️</span> Supprimer le groupe
                   </button>
@@ -424,7 +447,6 @@ const GroupePage = () => {
 
               <hr className="menu-separator" />
 
-              {/* Quitter (pour les membres non-admin) */}
               {!estCreateur && (
                 <button className="menu-item danger" onClick={() => navigate('/home')}>
                   <span>🚪</span> Quitter le groupe
@@ -450,7 +472,15 @@ const GroupePage = () => {
         
         {/* SIDEBAR - MEMBRES */}
         <aside className="groupe-sidebar">
-          <h3>👥 Membres</h3>
+          <div className="sidebar-header">
+            <h3>👥 Membres</h3>
+            {estCreateur && (
+              <button className="btn-add-member" onClick={() => setShowModal(true)} title="Ajouter un membre">
+                ➕
+              </button>
+            )}
+          </div>
+          
           <ul className="membres-list">
             {membres.map((membre, index) => (
               <li key={index} className="membre-item">
@@ -463,7 +493,6 @@ const GroupePage = () => {
                     <span className="membre-role admin">👑 Admin</span>
                   )}
                 </div>
-                {/* Bouton kick pour l'admin (pas sur soi-même) */}
                 {estCreateur && Number(membre.id) !== Number(userId) && (
                   <button className="kick-btn" onClick={() => handleKick(membre.id)} title="Retirer">✕</button>
                 )}
@@ -471,7 +500,6 @@ const GroupePage = () => {
             ))}
           </ul>
 
-          {/* Bouton rejoindre si pas encore membre */}
           {!estMembre && !estCreateur && (
             <button className="btn-rejoindre" onClick={rejoindreGroupe}>
               ✅ Rejoindre le groupe
@@ -483,6 +511,21 @@ const GroupePage = () => {
         <main className="groupe-chat">
           {(estMembre || estCreateur) ? (
             <>
+              {/* BANDEAU SÉANCES À VENIR */}
+              {seances.filter(s => new Date(s.date_seance) > new Date()).length > 0 && (
+                <div className="seances-banner">
+                  <h4>📅 Séances à venir</h4>
+                  <div className="seances-list">
+                    {seances.filter(s => new Date(s.date_seance) > new Date()).slice(0, 2).map(seance => (
+                      <div key={seance.id_seance} className="seance-item">
+                        <strong>{seance.titre}</strong>
+                        <span>{new Date(seance.date_seance).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit' })}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="messages-container">
                 {messages.length === 0 ? (
                   <div className="no-messages">
@@ -503,7 +546,6 @@ const GroupePage = () => {
                         {msg.texte}
                         {msg.est_epinglé && <span className="pin-badge">📌</span>}
                         
-                        {/* Bouton épingler pour l'admin */}
                         {estCreateur && (
                           <button 
                             className="pin-btn" 
@@ -519,6 +561,8 @@ const GroupePage = () => {
                     </div>
                   ))
                 )}
+                {/* ✅ Élément invisible pour l'auto-scroll */}
+                <div ref={messagesEndRef} />
               </div>
 
               <form className="chat-input" onSubmit={envoyerMessage}>
@@ -546,7 +590,7 @@ const GroupePage = () => {
         </main>
       </div>
 
-      {/* MODAL GESTION MEMBRES (Admin uniquement) */}
+      {/* MODAL GESTION MEMBRES */}
       {showModal && estCreateur && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -554,9 +598,7 @@ const GroupePage = () => {
               <h3>👥 Gérer les membres</h3>
               <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
             </div>
-
             <div className="modal-body">
-              {/* Ajouter un membre */}
               <div className="add-member-section">
                 <label>Ajouter un étudiant par ID :</label>
                 <div className="add-member-input">
@@ -574,7 +616,6 @@ const GroupePage = () => {
 
               <hr />
 
-              {/* Liste des membres */}
               <div className="members-list-admin">
                 <p><strong>{membres.length}</strong> membre{membres.length > 1 ? 's' : ''} dans ce groupe :</p>
                 
@@ -601,6 +642,63 @@ const GroupePage = () => {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL ANNONCER UNE SÉANCE */}
+      {showSeanceModal && estCreateur && (
+        <div className="modal-overlay" onClick={() => setShowSeanceModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>📅 Annoncer une séance de révision</h3>
+              <button className="modal-close" onClick={() => setShowSeanceModal(false)}>✕</button>
+            </div>
+            <form className="modal-body" onSubmit={annoncerSeance}>
+              <div className="form-group">
+                <label>Titre *</label>
+                <input 
+                  type="text" 
+                  value={newSeance.titre}
+                  onChange={(e) => setNewSeance({...newSeance, titre: e.target.value})}
+                  placeholder="Ex: Révision Partiel Algo"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Description</label>
+                <textarea 
+                  value={newSeance.description}
+                  onChange={(e) => setNewSeance({...newSeance, description: e.target.value})}
+                  placeholder="Chapitres concernés, exercices à préparer..."
+                  rows="3"
+                />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Date et heure *</label>
+                  <input 
+                    type="datetime-local" 
+                    value={newSeance.date_seance}
+                    onChange={(e) => setNewSeance({...newSeance, date_seance: e.target.value})}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Lieu</label>
+                  <input 
+                    type="text" 
+                    value={newSeance.lieu}
+                    onChange={(e) => setNewSeance({...newSeance, lieu: e.target.value})}
+                    placeholder="Ex: Bibliothèque, Salle A12..."
+                  />
+                </div>
+              </div>
+              <div className="modal-actions">
+                <button type="button" className="btn-cancel" onClick={() => setShowSeanceModal(false)}>Annuler</button>
+                <button type="submit" className="btn-confirm">📢 Annoncer</button>
+              </div>
+            </form>
           </div>
         </div>
       )}

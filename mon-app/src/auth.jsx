@@ -1,8 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect  } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Auth.css';
-import { useTheme } from './ThemeContext';
-
 function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
@@ -28,6 +26,36 @@ function Auth() {
   const [signupError, setSignupError] = useState('');
   const [signupSuccess, setSignupSuccess] = useState('');
 
+const [questionSecrete, setQuestionSecrete] = useState('');
+const [reponseSecrete, setReponseSecrete] = useState('');
+const [showReponse, setShowReponse] = useState(false);
+const [showQuestion, setShowQuestion] = useState(false); 
+
+
+// Liste des questions (privée)
+const questionsList = [
+  "Quel était le nom de votre premier animal de compagnie ?",
+  "Quelle est vote auteure préférée ?",
+  "Quel était le nom de votre professeur préféré ?",
+  "Quel est le modèle de la première voiture de vos parents ?",
+  "Quel est le nom de votre livre préféré ?",
+  "Quel était le nom de votre meilleur ami en primaire ?",
+  "Quelle est votre sportif préféré ?",
+  "Quel est le nom de votre école primaire ?",
+  "Quel est votre plat préféré ?",
+  "Quel est le nom de votre film préféré ?"
+];
+
+// Générer une question aléatoire au chargement du composant
+useEffect(() => {
+  if (!isLogin) {
+    const randomIndex = Math.floor(Math.random() * questionsList.length);
+    setQuestionSecrete(questionsList[randomIndex]);
+  }
+}, [isLogin]); // Se déclenche uniquement quand on passe en mode inscription
+
+
+
   // Niveaux disponibles par type de cursus
   const niveaux = {
     LMD: ['L1', 'L2', 'L3', 'M1', 'M2'],
@@ -35,39 +63,47 @@ function Auth() {
   };
 
   // --- Handlers ---
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoginLoading(true);
-    setLoginError('');
-    try {
-      const response = await fetch('http://localhost:5000/api/login', { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: loginEmail, mot_de_passe: loginPassword }),
-      });
-      
-      const data = await response.json();
-      
-      if (response.ok) {
-        // Stocker TOUTES les infos utiles
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('userId', data.user.id_etudiant);
-        localStorage.setItem('userName', data.user.nom);
-        localStorage.setItem('userFiliere', data.user.filiere);
-        localStorage.setItem('userNiveau', data.user.niveau); // ✅ Stocker le niveau
-        
-        navigate('/home');
-      } else {
-        setLoginError(data.message || 'Email ou mot de passe incorrect.');
-      }
-    } catch (err) {
-      console.error(err);
-      setLoginError('Le serveur ne répond pas.');
-    } finally {
-      setLoginLoading(false);
+// Après la réponse réussie de l'API login
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  
+  try {
+    const response = await axios.post('http://localhost:5000/api/login', {
+      email,
+      mot_de_passe: password
+    });
+    
+// Après réception du token
+localStorage.setItem('token', response.data.token);
+localStorage.setItem('user', JSON.stringify(response.data.user));
+
+// Redirection selon l'email
+if (response.data.user.email === 'admin@costudy.dz') {
+  navigate('/admin');
+} else {
+  navigate('/home'); // ou '/dashboard' si tu préfères
+}
+    
+    // 🎯 REDIRECTION CONDITIONNELLE
+    const userEmail = response.data.user.email;
+    
+    if (userEmail === 'admin@costudy.dz') {
+      // 👑 Admin → Interface admin
+      navigate('/admin');
+    } else {
+      // 👤 Étudiant → Dashboard personnel
+      navigate('/dashboard');
     }
-  };
+    
+    alert('✅ Connexion réussie !');
+    
+  } catch (error) {
+    alert(error.response?.data?.message || 'Erreur de connexion');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -94,6 +130,8 @@ function Auth() {
           cursus,      // ✅ Envoyer le type de cursus
           niveau,      // ✅ Envoyer le niveau
           mot_de_passe: password,
+          question_secrete: questionSecrete, 
+          reponse_secrete: reponseSecrete,
         }),
       });
 
@@ -129,14 +167,11 @@ function Auth() {
     </svg>
   );
 
-  const { darkMode, toggleDarkMode } = useTheme();
 
   return (
     <>
     <div className="auth-header">
-      <button className="dark-toggle-auth" onClick={toggleDarkMode}>
-        {darkMode ? '☀️' : '🌙'}
-      </button>
+
     </div>
     <div className="auth-page">
       <div className="auth-forms-wrapper">
@@ -165,9 +200,9 @@ function Auth() {
                   {showLoginPw ? <EyeOffIcon /> : <EyeIcon />}
                 </button>
               </div>
-              <div className="auth-forgot">
-                <a href="/forgot-password">Mot de passe oublié ?</a>
-              </div>
+<div className="auth-forgot">
+  <a href="/forgot-password">Mot de passe oublié ?</a>
+</div>
             </div> 
             <button type="submit" className="auth-submit" disabled={loginLoading}>
               {loginLoading ? <span className="auth-spinner" /> : 'Se connecter'}
@@ -243,6 +278,63 @@ function Auth() {
                 <button type="button" className="toggle-pw" onClick={() => setShowSignupPw(!showSignupPw)}><EyeIcon /></button>
               </div>
             </div>
+
+
+{/* Question de sécurité masquée */}
+{/* Question de sécurité - Mode Affichage Intelligent */}
+<div className="auth-field">
+  <label>Question de sécurité <span className="required">*</span></label>
+  
+  {/* Zone d'affichage personnalisée (remplace l'input) */}
+  <div className={`question-display-box ${showQuestion ? 'visible' : 'masked'}`}>
+    
+    {/* ÉTAT MASQUÉ (Clic pour voir) */}
+    {!showQuestion ? (
+      <div className="question-masked-content" onClick={() => setShowQuestion(true)}>
+        <span className="masked-text">••••••••••••••••••••••••••••••••••••</span>
+        <button type="button" className="eye-btn" title="Voir la question">
+          <EyeIcon />
+        </button>
+      </div>
+    ) : (
+      /* ÉTAT VISIBLE (Clic pour masquer) */
+      <div className="question-visible-content">
+        <p className="full-question-text">{questionSecrete}</p>
+        <button type="button" className="eye-btn" onClick={() => setShowQuestion(false)} title="Masquer la question">
+          <EyeOffIcon />
+        </button>
+      </div>
+    )}
+
+  </div>
+  
+  <small className="help-text">Cliquez sur l'icône 👁️ pour révéler la question.</small>
+</div>
+
+<div className="auth-field">
+  <label>Votre réponse <span className="required">*</span></label>
+  <div className="auth-input-icon">
+    <input 
+      type={showReponse ? 'text' : 'password'} 
+      placeholder="Votre réponse secrète" 
+      value={reponseSecrete} 
+      onChange={(e) => setReponseSecrete(e.target.value)} 
+      required 
+      autoComplete="off"
+    />
+    <button 
+      type="button" 
+      className="toggle-pw" 
+      onClick={() => setShowReponse(!showReponse)}
+      title={showReponse ? "Masquer la réponse" : "Afficher la réponse"}
+    >
+      {showReponse ? <EyeOffIcon /> : <EyeIcon />}
+    </button>
+  </div>
+  <small className="help-text">Gardez cette réponse secrète en mémoire.</small>
+</div>
+
+
             
             <button type="submit" className="auth-submit" disabled={signupLoading}>
               {signupLoading ? <span className="auth-spinner" /> : "S'inscrire"}

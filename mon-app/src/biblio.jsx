@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Biblio.css';
 import Footer from './footer';
+import { useNavigate } from 'react-router-dom';
+
 
 const Biblio = () => {
+    const navigate = useNavigate();
     const [fichiers, setFichiers] = useState([]);
     const [favorisIds, setFavorisIds] = useState([]);
     const [filterAnnee, setFilterAnnee] = useState('Tous');
@@ -24,9 +27,8 @@ const Biblio = () => {
 
  
 useEffect(() => {
-    // 1. Charger tous les fichiers
-    fetch('http://localhost:5000/api/fichiers')
-        .then(res => res.json())
+    // 1. Charger tous les fichiers valides
+fetch('http://localhost:5000/api/fichiers?statut=valide')        .then(res => res.json())
         .then(data => setFichiers(Array.isArray(data) ? data : []))
         .catch(err => console.error(err));
 
@@ -58,46 +60,67 @@ useEffect(() => {
         }
     };
 
-    const uploadFile = async (file) => {
-        const type = prompt("Type (Cours, TD, TP, Résumés, Test, Examen) ?");
-        if (type === null) return; 
-
-        const module = prompt("Nom du module ?");
-        if (module === null) return; 
-
-        const annee = prompt("Année du document ?", filterAnnee === 'Tous' ? 'L3' : filterAnnee);
-        if (!annee) return; 
-
-        const token = localStorage.getItem('token');
-        const formData = new FormData();
-        formData.append('fichier', file);
-        formData.append('id_groupe', 1);
-        formData.append('type', type);
-        formData.append('module', module);
-        formData.append('annee', annee);
-        formData.append('filiere', 'L3 Informatique');
-
-try {
-    const response = await fetch('http://localhost:5000/api/upload', {
-        method: 'POST',
-        headers: { 
-            // On ne met PAS de Content-Type ici, le navigateur le fait pour le FormData
-            'Authorization': `Bearer ${token}` 
-        },
-        body: formData,
-    });
-
-    if (response.ok) {
-        alert("Fichier envoyé avec succès ! Il sera visible après validation.");
-        window.location.reload(); 
-    } else {
-        const errorData = await response.json();
-        alert("Erreur : " + (errorData.message || "Échec de l'envoi"));
+const uploadFile = async (file) => {
+    const token = localStorage.getItem('token');
+    
+    // ✅ Vérifier si le token existe
+    if (!token) {
+        alert("Tu dois être connecté pour uploader des fichiers !");
+        navigate('/login'); // Redirige vers login
+        return;
     }
-} catch (err) {
-    console.error("Erreur réseau :", err);
-}
-    };
+    
+    const type = prompt("Type (Cours, TD, TP, Résumés, Test, Examen) ?");
+    if (type === null) return; 
+
+    const module = prompt("Nom du module ?");
+    if (module === null) return; 
+
+    const annee = prompt("Année du document ?", filterAnnee === 'Tous' ? 'L3' : filterAnnee);
+    if (!annee) return; 
+
+    // Récupère la filière et le niveau de l'utilisateur connecté
+    const userFiliere = localStorage.getItem('userFiliere') || 'Informatique';
+    const userNiveau = localStorage.getItem('userNiveau') || 'L3';
+
+    const formData = new FormData();
+    formData.append('fichier', file);
+    formData.append('type', type);
+    formData.append('module', module);
+    formData.append('annee', annee);
+    formData.append('filiere', userFiliere);
+    formData.append('niveau', userNiveau);
+
+    try {
+        const response = await fetch('http://localhost:5000/api/upload', {
+            method: 'POST',
+            headers: { 
+                'Authorization': `Bearer ${token}` 
+            },
+            body: formData,
+        });
+
+        if (response.status === 401) {
+            // ✅ Token expiré : déconnecter et rediriger
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            alert("Session expirée. Veuillez vous reconnecter.");
+            navigate('/login');
+            return;
+        }
+
+        if (response.ok) {
+            alert("✅ Fichier envoyé avec succès ! Il sera visible après validation.");
+            window.location.reload(); 
+        } else {
+            const errorData = await response.json();
+            alert("❌ Erreur : " + (errorData.message || "Échec de l'envoi"));
+        }
+    } catch (err) {
+        console.error("Erreur réseau :", err);
+        alert("❌ Erreur de connexion au serveur");
+    }
+};
 
 console.log("ID récupéré :", userId);
 console.log("Token récupéré :", token);

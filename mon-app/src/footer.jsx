@@ -6,7 +6,7 @@ const Footer = () => {
     <footer className="main-footer" id="contact">
       <div className="footer-content">
         <div className="footer-column brand-col">
-          <h2 className="logo-text">Flow</h2> {/* On garde le nouveau nom Flow */}
+          <h2 className="logo-text">Co'study</h2> {/* On garde le nouveau nom Flow */}
           <p className="footer-desc">
             La plateforme collaborative dédiée aux étudiants de l'Université d'Oran 1. 
             Simplifiez votre réussite, ensemble.

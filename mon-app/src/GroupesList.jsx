@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './GroupesList.css';
-import { useTheme } from './ThemeContext';
 import Footer from './footer';
 
 const GroupesList = () => {
   const { niveau } = useParams();
   const navigate = useNavigate();
-  const { darkMode, toggleDarkMode } = useTheme();
   const [groupes, setGroupes] = useState([]);
   const userId = localStorage.getItem('userId');
   const [demandesEnvoyees, setDemandesEnvoyees] = useState([]);
@@ -76,9 +74,7 @@ const annulerDemande = async (idGroupe) => {
       <div className="groupes-list-header">
         <button className="back-btn" onClick={() => navigate('/home')}>← Retour</button>
         <h2>Groupes — Niveau {niveau}</h2>
-        <button className="dark-mode-btn" onClick={toggleDarkMode}>
-          {darkMode ? '☀️' : '🌙'}
-        </button>
+
       </div>
 
       <div className="groupes-grid">

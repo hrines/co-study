@@ -1,42 +1,352 @@
-.view-tabs {
+/* ==========================================
+   GESTION GROUPES - STYLE ADMIN CO'STUDY
+   ========================================== */
+
+/* --- Container & Header --- */
+.management-container {
+  padding: 2rem;
+  animation: fadeIn 0.4s ease;
+}
+
+.management-header {
   display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.header-text h1 {
+  font-size: 1.8rem;
+  color: var(--bleu-fonce);
+  margin: 0 0 0.5rem 0;
+  font-weight: 700;
+}
+
+.header-text p {
+  color: var(--text-sub);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* --- Onglets (Tabs) --- */
+.view-tabs {
+  display: inline-flex;
+  gap: 0.5rem;
+  background: var(--blanc);
+  padding: 0.4rem;
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
 }
 
 .tab-btn {
-  padding: 0.7rem 1.5rem;
-  border: 0.06rem solid var(--border-color);
-  background: var(--blanc);
+  padding: 0.6rem 1.2rem;
+  border: none;
+  background: transparent;
   color: var(--text-sub);
-  border-radius: 0.5rem;
+  border-radius: 0.7rem;
   font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 }
 
 .tab-btn:hover {
   background: var(--gris-fond);
+  color: var(--bleu-moyen);
 }
 
 .tab-btn.active {
   background: var(--bleu-moyen);
   color: white;
-  border-color: var(--bleu-moyen);
+  box-shadow: 0 0.2rem 0.5rem rgba(32, 83, 117, 0.25);
 }
 
-.btn-delete {
+/* --- Tableau Standard --- */
+.table-container {
+  background: var(--blanc);
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.data-table {
   width: 100%;
-  padding: 0.6rem;
-  background: #ff4757;
+  border-collapse: collapse;
+}
+
+.data-table thead {
+  background: var(--bleu-fonce);
   color: white;
+}
+
+.data-table th {
+  padding: 1rem 1.2rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.data-table tbody tr:hover {
+  background: var(--gris-fond);
+}
+
+.group-name {
+  font-weight: 600;
+  color: var(--bleu-moyen);
+}
+
+/* --- Badges --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.badge.en_attente {
+  background: rgba(246, 107, 14, 0.12);
+  color: var(--orange-accent);
+}
+
+.badge.valide {
+  background: rgba(32, 83, 117, 0.12);
+  color: var(--bleu-moyen);
+}
+
+.badge.createur {
+  background: linear-gradient(135deg, #ffd700, #ffb300);
+  color: #2c1810;
+  box-shadow: 0 2px 6px rgba(255, 215, 0, 0.3);
+}
+
+/* --- Boutons d'actions --- */
+.actions-cell {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+
+.btn-icon {
+  border: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  background: var(--gris-fond);
+  color: var(--text-sub);
+}
+
+.btn-icon:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-icon.validate { background: rgba(32, 83, 117, 0.15); color: var(--bleu-moyen); }
+.btn-icon.validate:hover:not(:disabled) { background: var(--bleu-moyen); color: white; }
+
+.btn-icon.refuse, .btn-icon.delete-group, .btn-icon.kick { background: rgba(255, 71, 87, 0.15); color: #ff4757; }
+.btn-icon.refuse:hover:not(:disabled), 
+.btn-icon.delete-group:hover:not(:disabled), 
+.btn-icon.kick:hover:not(:disabled) { background: #ff4757; color: white; }
+
+.btn-icon.view { background: rgba(246, 107, 14, 0.15); color: var(--orange-accent); }
+.btn-icon.view:hover:not(:disabled) { background: var(--orange-accent); color: white; }
+
+.btn-icon.edit { background: rgba(108, 117, 125, 0.15); color: #6c757d; }
+.btn-icon.edit:hover:not(:disabled) { background: #6c757d; color: white; }
+
+/* --- Modals (Commun) --- */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(17, 43, 60, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+  background: var(--blanc);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-content.modal-large {
+  max-width: 850px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--bleu-fonce);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: var(--text-sub);
+  transition: color 0.2s;
+  padding: 0.2rem;
+}
+.modal-close:hover { color: #ff4757; }
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-body input, .modal-body select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.modal-body input:focus, .modal-body select:focus {
+  outline: none;
+  border-color: var(--bleu-moyen);
+  box-shadow: 0 0 0 3px rgba(32, 83, 117, 0.15);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-cancel, .btn-confirm {
+  padding: 0.6rem 1.2rem;
   border: none;
   border-radius: 0.5rem;
   font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.2s ease;
+}
+.btn-cancel { background: var(--gris-fond); color: var(--text-sub); }
+.btn-cancel:hover { background: #e9ecef; }
+.btn-confirm { background: var(--orange-accent); color: white; }
+.btn-confirm:hover:not(:disabled) { background: #e06000; }
+.btn-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* --- Table Membres (Spécifique) --- */
+.members-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.members-table th {
+  background: var(--gris-fond);
+  color: var(--bleu-fonce);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.members-table td {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.9rem;
+}
+.members-table tbody tr:last-child td { border-bottom: none; }
+.members-table tbody tr:hover { background: var(--gris-fond); }
+
+.role-select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.4rem;
+  font-size: 0.85rem;
+  background: var(--blanc);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.role-select:hover { border-color: var(--bleu-moyen); }
+.role-select:focus { 
+  outline: none; 
+  border-color: var(--bleu-moyen); 
+  box-shadow: 0 0 0 2px rgba(32, 83, 117, 0.15); 
 }
 
-.btn-delete:hover {
-  background: #ff3838;
+/* --- États Vides & Chargement --- */
+.empty-state, .loading-state {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--text-sub);
+}
+.loading-state { color: var(--bleu-moyen); font-weight: 600; }
+
+/* --- Animations --- */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .management-header { flex-direction: column; }
+  .data-table { display: block; overflow-x: auto; white-space: nowrap; }
+  .modal-content { width: 95%; margin: 1rem; }
+  .modal-content.modal-large { max-width: 95%; }
+  .actions-cell { gap: 0.3rem; }
+  .btn-icon { width: 1.8rem; height: 1.8rem; font-size: 0.85rem; }
 }

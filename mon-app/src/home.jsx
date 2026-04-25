@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from './ThemeContext';
 import './home.css';
 import Footer from './footer';
 
@@ -12,7 +11,6 @@ import Agenda from './agenda';
 
 const Home = () => {
   const navigate = useNavigate();
-  const { darkMode, toggleDarkMode } = useTheme();
 
   // ==========================================
   // ÉTATS
@@ -224,12 +222,12 @@ const Home = () => {
   // RENDER PRINCIPAL
   // ==========================================
   return (
-    <div className={`dashboard-layout ${isCollapsed ? 'collapsed' : ''} ${darkMode ? 'dark' : ''}`}>
+    <div className={`dashboard-layout ${isCollapsed ? 'collapsed' : ''} `}>
       
       {/* ========== SIDEBAR ========== */}
       <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-header">
-          {!isCollapsed && <div className="logo">Flow 🎓</div>}
+          {!isCollapsed && <div className="logo">Co'study 🎓</div>}
           <button className="toggle-btn" onClick={toggleSidebar}>
             {isCollapsed ? '☰' : '✕'}
           </button>
@@ -386,9 +384,6 @@ const Home = () => {
               + Créer un Groupe
             </button>
             
-            <button className="dark-mode-btn" onClick={toggleDarkMode}>
-              {darkMode ? '☀️' : '🌙'}
-            </button>
             
             <div className="user-profile">
               <span>Salut, <strong>{nomClient}</strong></span>
