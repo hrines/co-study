@@ -12,22 +12,34 @@ import LandingPage from './LandingPage';
 import Agenda from './agenda';
 import ForgotPassword from './ForgotPassword';
 
-// ✅ PLUS BESOIN DE ProtectedRoute ni Dashboard
+// ✅ LE GARDE DU CORPS : Empêche l'accès à /admin si ce n'est pas le bon mail
+const AdminGuard = ({ children }) => {
+  const user = JSON.parse(localStorage.getItem('user'));
+  
+  if (!user || user.email !== 'admin@costudy.dz') {
+    return <Navigate to="/home" replace />; // On le dégage vers l'accueil étudiant
+  }
+  
+  return children;
+};
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Page d'accueil */}
         <Route path="/" element={<LandingPage />} />
         
-        {/* Pages d'authentification */}
         <Route path="/login" element={<Authentification />} />
         <Route path="/signup" element={<Authentification />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         
-        {/* Routes protégées - Accès direct (la vérif se fait dans le login) */}
-        <Route path="/admin" element={<AdminSy />} />
+        {/* 🔒 ROUTE ADMIN PROTÉGÉE */}
+        <Route path="/admin" element={
+          <AdminGuard>
+            <AdminSy />
+          </AdminGuard>
+        } />
+
         <Route path="/home" element={<Home />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/create-group" element={<CreateGroup />} />
@@ -35,9 +47,10 @@ function App() {
         <Route path="/groupe/:id" element={<GroupePage />} />
         <Route path="/groupes/:niveau" element={<GroupesList />} />
         <Route path="/biblio" element={<Biblio />} />
+        
+        {/* Redirection vers le chemin propre /admin */}
         <Route path="/adminsy" element={<Navigate to="/admin" replace />} />
         
-        {/* Redirection par défaut */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

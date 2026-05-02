@@ -68,8 +68,12 @@ const Home = () => {
     return null;
   }, []);
 
-  const userId = getUserId();
-  const nomClient = localStorage.getItem('userName');
+// ✅ BON
+const userId = getUserId();
+
+// Récupère l'objet user complet
+const user = JSON.parse(localStorage.getItem('user') || '{}');
+const nomClient = user?.prenom || user?.nom || 'Invité'; // ← Utilise les bonnes clés
   const avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${nomClient || 'Guest'}&backgroundColor=205375`;
 
   // ==========================================
@@ -249,12 +253,6 @@ const Home = () => {
                 {nbNotifs > 99 ? '99+' : nbNotifs}
               </span>
             )}
-          </div>
-
-          {/* Admin */}
-          <div className="nav-item" onClick={() => navigate('/adminsy')}>
-            <span className="icon">🛠️</span>
-            {!isCollapsed && <span className="text">Interface Admin</span>}
           </div>
 
           {/* Bibliothèque */}

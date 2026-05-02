@@ -1,4 +1,12 @@
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ==========================================
+   AUTH - FORMULAIRE AGRANDI (SANS SCROLL)
+   ========================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 .auth-header {
   position: fixed;
@@ -7,20 +15,7 @@
   z-index: 100;
 }
 
-.dark-toggle-auth {
-  background: rgba(255,255,255,0.15);
-  border: none;
-  border-radius: 50%;
-  width: 2.5rem;
-  height: 2.5rem;
-  cursor: pointer;
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ---- Page ---- */
+/* PAGE PRINCIPALE */
 .auth-page {
   position: relative;
   display: flex;
@@ -32,13 +27,13 @@
   padding: 2rem;
 }
 
-/* WRAPPER CENTRAL */
+/* WRAPPER CENTRAL (PLUS GRAND) */
 .auth-forms-wrapper {
   position: relative;
   width: 90vw;
   max-width: 70rem;
-  height: 85vh;
-  max-height: 50rem;
+  height: 95vh; /* ✅ Augmenté (était 85vh) */
+  max-height: 60rem; /* ✅ Augmenté (était 50rem) */
   border-radius: 1.5rem;
   overflow: hidden;
   box-shadow: var(--shadow);
@@ -51,99 +46,123 @@
   background: var(--blanc);
   position: absolute;
   top: 0;
-  width: 55%; /* Le formulaire occupe 55% */
+  width: 55%;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 2rem 4rem;
+  align-items: center;
+  padding: 2rem 3rem;
   transition: opacity 0.4s ease;
+  overflow: visible; /* ✅ Permet au contenu de déborder si besoin */
 }
 
 /* Login à droite */
-.auth-form-panel:first-child { right: 0; }
+.auth-form-panel:first-child {
+  right: 0;
+}
+
 /* Signup à gauche */
-.auth-form-panel:last-child  { left: 0; }
+.auth-form-panel:last-child {
+  left: 0;
+}
 
-.auth-form-panel.active  { opacity: 1; pointer-events: all; z-index: 1; }
-.auth-form-panel.hidden  { opacity: 0; pointer-events: none; z-index: 0; }
+.auth-form-panel.active {
+  opacity: 1;
+  pointer-events: all;
+  z-index: 1;
+}
 
-/* ---- Titres ---- */
+.auth-form-panel.hidden {
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* TITRES */
 .auth-title {
-  font-size: 2.2rem;
+  font-size: 2rem; /* ✅ Légèrement réduit */
   font-weight: 800;
   color: var(--text-main);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.375rem;
 }
 
 .auth-subtitle {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--text-sub);
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
+
+/* ICÔNE MOT DE PASSE */
 .auth-input-icon {
-  position: relative; /* Indispensable pour que l'œil se place par rapport à ce bloc */
+  position: relative;
   display: flex;
   align-items: center;
   width: 100%;
 }
+
 .auth-input-icon input {
-  padding-right: 3rem !important; /* Réserve l'espace pour l'icône à droite */
+  padding-right: 3rem !important;
 }
 
 .toggle-pw {
   position: absolute;
-  right: 1rem; /* Aligné à 1rem du bord droit interne */
+  right: 1rem;
   background: none;
   border: none;
   cursor: pointer;
   color: var(--text-sub);
   display: flex;
   padding: 0;
-  z-index: 2; /* Pour passer au-dessus de l'input */
+  z-index: 2;
 }
 
-/* ---- Formulaire ---- */
+/* FORMULAIRE */
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 0.875rem; /* ✅ Réduit pour gagner de la place */
+  width: 100%;
   max-width: 26rem;
 }
+
 .auth-row {
   display: flex;
-  gap: 1rem; /* L'espace entre Nom et Prénom */
+  gap: 0.875rem; /* ✅ Réduit */
   width: 100%;
 }
 
 .auth-row .auth-field {
-  flex: 1; /* Force les deux champs à prendre la même largeur (50/50) */
+  flex: 1;
 }
 
+/* CHAMPS DE SAISIE */
 .auth-field input,
 .auth-field select {
   width: 100%;
-  padding: 0.65rem 1.1rem;
+  padding: 0.65rem 1rem; /* ✅ Légèrement réduit */
   border: 2px solid var(--border-color);
   border-radius: 0.75rem;
   background: var(--gris-fond);
   color: var(--text-main);
   transition: var(--transition);
   outline: none;
+  font-size: 0.9rem; /* ✅ Légèrement réduit */
 }
 
-.auth-field input:focus {
+.auth-field input:focus,
+.auth-field select:focus {
   border-color: var(--bleu-moyen);
-  background: #fff;
+  background: #ffffff;
 }
 
-/* BOUTON ORANGE CO'STUDY */
+/* BOUTON SUBMIT */
 .auth-submit {
   width: 100%;
-  padding: 1rem;
+  padding: 0.9rem; /* ✅ Légèrement réduit */
   background: var(--orange-accent);
   color: #ffffff;
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
   border: none;
   border-radius: 0.75rem;
@@ -154,14 +173,14 @@
 
 .auth-submit:hover:not(:disabled) {
   filter: brightness(1.1);
-  transform: translateY(-2px);
+  transform: translateY(-0.125rem);
 }
 
-/* PANNEAU BLEU COULISSANT */
+/* PANNEAU BLEU OVERLAY */
 .auth-overlay {
   position: absolute;
   top: 0;
-  width: 45%; /* L'overlay occupe les 45% restants */
+  width: 45%;
   height: 100%;
   z-index: 10;
   background: linear-gradient(145deg, var(--bleu-fonce) 0%, var(--bleu-moyen) 100%);
@@ -172,14 +191,20 @@
   transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
 }
 
-/* Translation de l'overlay */
-.auth-overlay.overlay-right { transform: translateX(0); left: 0; }
-.auth-overlay.overlay-left  { transform: translateX(122.2%); left: 0; } /* 55/45 = 1.22 */
+.auth-overlay.overlay-right {
+  transform: translateX(0);
+  left: 0;
+}
+
+.auth-overlay.overlay-left {
+  transform: translateX(122.2%);
+  left: 0;
+}
 
 .auth-overlay-content {
   position: relative;
   z-index: 5;
-  color: #fff;
+  color: #ffffff;
   text-align: center;
   padding: 2.5rem;
 }
@@ -207,53 +232,50 @@
   color: var(--bleu-fonce);
 }
 
-
-/* Conteneur principal qui ressemble à un input */
+/* QUESTION DE SÉCURITÉ */
 .question-display-box {
-  border: 2px solid var(--border-color, #e0e0e0);
+  border: 2px solid var(--border-color);
   background-color: var(--gris-fond);
-  border-radius: 12px;
+  border-radius: 0.75rem;
   transition: all 0.3s ease;
   overflow: hidden;
+  margin-top: 0.25rem;
 }
 
-/* Focus effect */
 .question-display-box.visible {
-  border-color: var(--orange-accent); /* Ou ta couleur principale */
+  border-color: var(--orange-accent);
   background-color: var(--blanc);
 }
 
-/* --- MODE MASQUÉ --- */
 .question-masked-content {
   display: flex;
   align-items: center;
   padding: 0 1rem;
-  height: 52px; /* Même hauteur que tes autres inputs */
+  height: 3rem; /* ✅ Réduit */
   cursor: pointer;
 }
 
 .masked-text {
   flex: 1;
-  color: #aaa;
+  color: #aaaaaa;
   font-size: 1.2rem;
-  letter-spacing: 2px;
+  letter-spacing: 0.125rem;
 }
 
-/* --- MODE VISIBLE (Texte long) --- */
 .question-visible-content {
   display: flex;
-  align-items: flex-start; /* Alignement en haut pour le texte long */
-  padding: 1rem;
-  gap: 1rem;
+  align-items: flex-start;
+  padding: 0.75rem; /* ✅ Réduit */
+  gap: 0.75rem;
 }
 
 .full-question-text {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.875rem; /* ✅ Réduit */
   color: var(--text-main);
-  line-height: 1.5;
-  word-wrap: break-word; /* ✅ IMPORTANT : Coupe les mots trop longs si besoin */
-  white-space: normal;   /* ✅ IMPORTANT : Autorise le retour à la ligne */
+  line-height: 1.4;
+  word-wrap: break-word;
+  white-space: normal;
 }
 
 .eye-btn {
@@ -265,25 +287,70 @@
   align-items: center;
   justify-content: center;
   padding: 0.2rem;
-  flex-shrink: 0; /* Empêche le bouton de s'écraser */
+  flex-shrink: 0;
 }
 
 .eye-btn:hover {
   color: var(--orange-accent);
 }
 
+/* AIDE TEXTE */
+.help-text {
+  display: block;
+  font-size: 0.75rem; /* ✅ Réduit */
+  color: var(--text-sub);
+  margin-top: 0.375rem;
+}
 
-/* Formes décoratives */
-.shape { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.08); }
-.shape-1 { width: 15rem; height: 15rem; top: -5rem; right: -5rem; }
-.shape-2 { width: 10rem; height: 10rem; bottom: -2rem; left: -2rem; }
+/* FORMES DÉCORATIVES */
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+}
 
-/* Responsive mobile */
+.shape-1 {
+  width: 15rem;
+  height: 15rem;
+  top: -5rem;
+  right: -5rem;
+}
+
+.shape-2 {
+  width: 10rem;
+  height: 10rem;
+  bottom: -2rem;
+  left: -2rem;
+}
+
+/* RESPONSIVE MOBILE */
 @media (max-width: 48rem) {
-  .auth-row { flex-direction: column; gap: 0.8rem;}
-  .auth-forms-wrapper { flex-direction: column; height: auto; max-height: none; width: 100%; }
-  .auth-overlay { display: none; }
-  .auth-form-panel { position: relative; width: 100%; opacity: 1 !important; pointer-events: all !important; display: block; }
-  .auth-form-panel.hidden { display: none; }
-  .auth-switch-mobile { display: block; margin-top: 1rem; text-align: center; }
+  .auth-row {
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .auth-forms-wrapper {
+    flex-direction: column;
+    height: auto;
+    max-height: none;
+    width: 100%;
+  }
+
+  .auth-overlay {
+    display: none;
+  }
+
+  .auth-form-panel {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 95vh;
+    opacity: 1 !important;
+    pointer-events: all !important;
+  }
+
+  .auth-form-panel.hidden {
+    display: none;
+  }
 }

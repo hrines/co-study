@@ -1,4 +1,5 @@
-import { useState, useEffect  } from 'react';
+import axios from 'axios'; 
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Auth.css';
 function Auth() {
@@ -25,6 +26,7 @@ function Auth() {
   const [signupLoading, setSignupLoading] = useState(false);
   const [signupError, setSignupError] = useState('');
   const [signupSuccess, setSignupSuccess] = useState('');
+  const [loading, setLoading] = useState(false); 
 
 const [questionSecrete, setQuestionSecrete] = useState('');
 const [reponseSecrete, setReponseSecrete] = useState('');
@@ -66,42 +68,47 @@ useEffect(() => {
 // Après la réponse réussie de l'API login
 const handleLogin = async (e) => {
   e.preventDefault();
-  setLoading(true);
+  setLoginLoading(true);
+  setLoginError('');
   
   try {
+    console.log("📤 Tentative de connexion...");
+    console.log("Email:", loginEmail);
+    console.log("Mot de passe:", loginPassword);
+    
     const response = await axios.post('http://localhost:5000/api/login', {
-      email,
-      mot_de_passe: password
+      email: loginEmail,
+      mot_de_passe: loginPassword
     });
     
-// Après réception du token
-localStorage.setItem('token', response.data.token);
-localStorage.setItem('user', JSON.stringify(response.data.user));
+    console.log("✅ Réponse reçue:", response.data);
+    
+    localStorage.setItem('token', response.data.token);
+    localStorage.setItem('user', JSON.stringify(response.data.user));
 
-// Redirection selon l'email
-if (response.data.user.email === 'admin@costudy.dz') {
-  navigate('/admin');
-} else {
-  navigate('/home'); // ou '/dashboard' si tu préfères
-}
-    
-    // 🎯 REDIRECTION CONDITIONNELLE
-    const userEmail = response.data.user.email;
-    
-    if (userEmail === 'admin@costudy.dz') {
-      // 👑 Admin → Interface admin
+    if (response.data.user.email === 'admin@costudy.dz') {
+      console.log("👑 Redirection vers /admin");
       navigate('/admin');
     } else {
-      // 👤 Étudiant → Dashboard personnel
-      navigate('/dashboard');
+      console.log("👤 Redirection vers /home");
+      navigate('/home');
     }
     
-    alert('✅ Connexion réussie !');
-    
   } catch (error) {
-    alert(error.response?.data?.message || 'Erreur de connexion');
+    console.error("❌ ERREUR LOGIN:", error);
+    
+    if (error.response) {
+      console.error("📄 Status:", error.response.status);
+      console.error("📄 Message:", error.response.data);
+      alert(error.response.data.message || 'Erreur de connexion');
+    } else if (error.request) {
+      console.error("📡 Pas de réponse du serveur:", error.request);
+      alert("Le serveur ne répond pas. Vérifie qu'il est démarré sur le port 5000.");
+    } else {
+      alert('Erreur de connexion');
+    }
   } finally {
-    setLoading(false);
+    setLoginLoading(false);
   }
 };
 
@@ -184,7 +191,7 @@ if (response.data.user.email === 'admin@costudy.dz') {
           <form onSubmit={handleLogin} className="auth-form">
             <div className="auth-field">
               <label>Email</label>
-              <input type="email" placeholder="exemple@email.com" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required />
+              <input type="email" name="email" placeholder="exemple@email.com" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required />
             </div>
             <div className="auth-field">
               <label>Mot de passe</label>
@@ -192,6 +199,7 @@ if (response.data.user.email === 'admin@costudy.dz') {
                 <input
                   type={showLoginPw ? 'text' : 'password'}
                   placeholder="Votre mot de passe"
+                  name="password"
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   required

@@ -2,6 +2,14 @@
    BIBLIO.CSS - CO'STUDY THEME (STRICT PALETTE)
    ========================================== */
 
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
 /* ========== LAYOUT PRINCIPAL ========== */
 .biblio-container {
   min-height: 100vh;
@@ -9,16 +17,16 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-height: 0;
 }
 
 .biblio-main-content {
-  flex: 1;
+  flex: 1; 
   display: flex;
   gap: 2rem;
   padding: 2rem 2.5rem;
   width: 100%;
 }
-
 .biblio-left {
   flex: 3;
   min-width: 0;
@@ -329,9 +337,10 @@
   background: linear-gradient(135deg, var(--bleu-fonce), var(--bleu-moyen));
   color: white;
   padding: 3rem 2rem 1.5rem 2rem;
-  margin-top: auto;
+  margin-top: auto; /* 🔑 MAGIE FLEXBOX : force le footer tout en bas */
   border-top: 0.2rem solid var(--orange-accent);
   width: 100%;
+  flex-shrink: 0; 
 }
 
 .footer-content {
@@ -352,6 +361,7 @@
   text-transform: uppercase;
   letter-spacing: 0.03rem;
 }
+
 
 .footer-section p,
 .footer-section a {
@@ -446,26 +456,3 @@
   }
 }
 
-/* ========== DARK MODE ========== */
-.dark-mode .bib-stats-card,
-.dark-mode .module-section,
-.dark-mode .file-card,
-.dark-mode .empty-msg {
-  background: #16213e; /* Gardé car c'est une surcharge dark mode spécifique */
-  border-color: #3a3a5a;
-}
-
-.dark-mode .file-info h4 {
-  color: var(--text-dark-main);
-}
-
-.dark-mode .shelves-filters button {
-  background: #16213e;
-  color: var(--text-dark-sub);
-  border-color: #3a3a5a;
-}
-
-.dark-mode .shelves-filters button.active {
-  background: var(--bleu-moyen);
-  color: white;
-}

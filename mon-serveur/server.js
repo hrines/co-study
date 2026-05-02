@@ -146,7 +146,10 @@ app.post('/api/login', (req, res) => {
     if (err) return res.status(500).json({ message: "Erreur serveur" });
     if (result.length === 0) return res.status(401).json({ message: "Email ou mot de passe incorrect" });
     
-    const user = result[0];
+    const user = result[0]; // ← Déclaré EN PREMIER !
+    
+    console.log("Utilisateur trouvé en BDD:", user); // ✅ Maintenant ça marche
+    
     const match = await bcrypt.compare(mot_de_passe, user.mot_de_passe);
     
     if (!match) return res.status(401).json({ message: "Email ou mot de passe incorrect" });
@@ -157,8 +160,12 @@ app.post('/api/login', (req, res) => {
       { expiresIn: '24h' }
     );
     
-    delete user.mot_de_passe;
-    res.status(200).json({ message: "Connexion réussie !", user, token });
+delete user.mot_de_passe;
+res.status(200).json({ 
+  message: "Connexion réussie !", 
+  user, 
+  token 
+});
   });
 });
 
@@ -497,6 +504,8 @@ app.post('/api/groupes/:id/seances', verifyToken, (req, res) => {
   });
 });
 
+
+
 // Récupérer les séances d'un groupe
 app.get('/api/groupes/:id/seances', (req, res) => {
   const sql = `SELECT s.*, e.nom as createur_nom, e.prenom as createur_prenom 
@@ -798,35 +807,89 @@ app.get('/api/admin/groupes/:id/membres', verifyAdmin, (req, res) => {
   });
 });
 
-// 👢 Kick un membre d'un groupe
-app.delete('/api/admin/groupes/:groupeId/membres/:etudiantId', verifyAdmin, (req, res) => {
-  const { groupeId, etudiantId } = req.params;
+
+// ==========================================
+// 🔍 RECHERCHE D'ÉTUDIANTS (pour ajout membre)
+// ==========================================
+app.get('/api/users/search', verifyToken, (req, res) => {
+  const { q } = req.query;
   
-  db.query("SELECT id_etudiant, nom_groupe FROM groupes WHERE id_groupe = ?", [groupeId], 
+  if (!q || q.length < 2) {
+    return res.json([]);
+  }
+  
+  const searchTerm = `%${q}%`;
+  const currentUserId = req.userId;
+  
+  const sql = `
+    SELECT id_etudiant, nom, prenom, email, filiere, niveau 
+    FROM etudiants 
+    WHERE (nom LIKE ? OR prenom LIKE ? OR email LIKE ?)
+    AND id_etudiant != ?
+    ORDER BY nom, prenom
+    LIMIT 10
+  `;
+  
+  db.query(sql, [searchTerm, searchTerm, searchTerm, currentUserId], 
+    (err, results) => {
+      if (err) {
+        console.error("❌ Erreur recherche utilisateurs:", err);
+        return res.status(500).json({ error: err.message });
+      }
+      res.json(results);
+    }
+  );
+});
+// ==========================================
+// 👥 ROUTE POUR CRÉATEUR : Kick un membre
+// ==========================================
+app.delete('/api/groupe/:id/membres/:memberId', verifyToken, (req, res) => {
+  const { id, memberId } = req.params;
+  const userId = req.userId;
+  
+  // 1. Vérifier que le groupe existe et récupérer le créateur
+  db.query("SELECT id_etudiant, nom_groupe FROM groupes WHERE id_groupe = ?", [id], 
     (err, group) => {
-      if (err || !group.length) return res.status(404).json({ message: "Groupe non trouvé" });
-      
-      if (group[0].id_etudiant == etudiantId) {
-        return res.status(400).json({ message: "Impossible de retirer le créateur du groupe" });
+      if (err || !group.length) {
+        return res.status(404).json({ message: "Groupe non trouvé" });
       }
       
+      const createurId = group[0].id_etudiant;
+      const nomGroupe = group[0].nom_groupe;
+      
+      // 2. Seul le créateur peut kick
+      if (Number(createurId) !== Number(userId)) {
+        return res.status(403).json({ message: "Seul le créateur peut retirer des membres" });
+      }
+      
+      // 3. On ne peut pas se kick soi-même
+      if (Number(memberId) === Number(userId)) {
+        return res.status(400).json({ message: "Tu ne peux pas te retirer toi-même" });
+      }
+      
+      // 4. Supprimer le membre de membres_groupe
       db.query("DELETE FROM membres_groupe WHERE id_groupe = ? AND id_etudiant = ?", 
-        [groupeId, etudiantId], 
+        [id, memberId], 
         (err) => {
-          if (err) return res.status(500).json({ error: err.message });
+          if (err) {
+            return res.status(500).json({ message: "Erreur serveur" });
+          }
           
-          db.query("INSERT INTO notifications (id_etudiant, message, type, id_reference) VALUES (?, ?, 'kick_groupe', ?)", 
-            [etudiantId, `Vous avez été retiré du groupe "${group[0].nom_groupe}" par l'administrateur.`, groupeId]
+          // 5. Notification au membre kické
+          db.query("INSERT INTO notifications (id_etudiant, message, type, id_reference) VALUES (?, ?, 'kick_groupe', ?)",
+            [memberId, `Vous avez été retiré du groupe "${nomGroupe}" par le créateur.`, id]
           );
           
-          io.to(groupeId.toString()).emit('member_kicked', { kickedId: parseInt(etudiantId) });
+          // 6. Socket : informer les autres membres en temps réel
+          io.to(id.toString()).emit('user_kicked', { kickedId: parseInt(memberId) });
           
-          res.json({ message: "Membre retiré du groupe" });
+          res.json({ message: "Membre retiré avec succès" });
         }
       );
     }
   );
 });
+
 
 // ✏️ Renommer un groupe
 app.put('/api/admin/groupes/:id/rename', verifyAdmin, (req, res) => {

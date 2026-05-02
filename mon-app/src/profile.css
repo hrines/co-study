@@ -140,39 +140,56 @@
   color: var(--text-sub);
 }
 
-/* Favoris */
+/* ==========================================
+   FAVORIS - STYLE CORRIGÉ
+   ========================================== */
+
 .modern-file-item {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.8rem;
+  padding: 1rem;
   border-radius: 0.75rem;
   transition: var(--transition);
-  border: 1px solid transparent;
-  word-break: break-all;    /* Coupe le mot s'il est trop long */
-  overflow-wrap: break-word; /* Force le retour à la ligne */
-  line-height: 1.2;
-  
+  border: 0.0625rem solid var(--border-color);
+  background: var(--blanc);
+  margin-bottom: 0.75rem;
 }
 
 .modern-file-item:hover {
   background: var(--gris-fond);
-  border-color: var(--border-color);
+  border-color: var(--bleu-moyen);
+  transform: translateX(0.25rem);
 }
 
 .file-icon-box {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(246, 107, 14, 0.1);
+  border-radius: 0.5rem;
 }
 
 .file-info {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0; /* Important pour le text-overflow */
 }
 
 .file-name {
   font-weight: 600;
   font-size: 0.9rem;
   color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .file-meta {
@@ -180,20 +197,79 @@
   color: var(--text-sub);
 }
 
+/* Bouton Ouvrir - Horizontal */
 .btn-open-file {
-  margin-left: auto;
   background: var(--bleu-fonce);
-  color: white;
+  color: var(--blanc);
   border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 0.4rem;
-  font-size: 0.8rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap; /* Texte horizontal */
+  flex-shrink: 0;
 }
 
-.mt-4 { margin-top: 2rem; }
-
-/* Dark Mode Overrides */
-body.dark .profile-avatar-initials {
-  border-color: var(--bleu-fonce);
+.btn-open-file:hover {
+  background: var(--orange-accent);
+  transform: translateY(-0.125rem);
 }
+
+/* Alternative : Bouton vertical compact (si tu préfères) */
+.btn-open-file-compact {
+  background: var(--bleu-fonce);
+  color: var(--blanc);
+  border: none;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  writing-mode: vertical-rl; /* Texte vertical */
+  text-orientation: mixed;
+  flex-shrink: 0;
+}
+
+.btn-open-file-compact:hover {
+  background: var(--orange-accent);
+}
+
+/* Empty state */
+.favorites-empty {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--text-sub);
+}
+
+.favorites-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.favorites-empty p {
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 48rem) {
+  .modern-file-item {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  
+  .file-info {
+    width: calc(100% - 4rem);
+  }
+  
+  .btn-open-file {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+}
+
+.mt-4 { margin-top: 2rem; } /* Utilitaire de marge pour espacer les sections*/

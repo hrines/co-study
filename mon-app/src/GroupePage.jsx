@@ -55,6 +55,11 @@ const GroupePage = () => {
   const menuRef = useRef(null);
   const messagesEndRef = useRef(null); // ✅ Pour l'auto-scroll
 
+  // États pour la recherche de membres
+const [searchTerm, setSearchTerm] = useState('');
+const [searchResults, setSearchResults] = useState([]);
+const [showSearchResults, setShowSearchResults] = useState(false);
+
   // ==========================================
   // HANDLERS SOCKET
   // ==========================================
@@ -90,9 +95,15 @@ const GroupePage = () => {
   }, [userId, navigate]);
 
   // Scroll automatique vers le bas
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+// Scroll automatique vers le bas
+const scrollToBottom = () => {
+  if (messagesEndRef.current) {
+    messagesEndRef.current.scrollIntoView({ 
+      behavior: "auto", // ✅ 'auto' pour un scroll instantané (mieux pour le chat)
+      block: "end" 
+    });
+  }
+};
 
   // ==========================================
   // CHARGEMENT INITIAL + SOCKET
@@ -297,30 +308,37 @@ const GroupePage = () => {
     }
   };
 
-  const handleKick = async (memberId) => {
-    if (Number(memberId) === Number(userId)) {
-      return alert("Tu ne peux pas te retirer toi-même !");
-    }
-    
-    if (!window.confirm(`Retirer définitivement ce membre du groupe ?`)) return;
-    
-    try {
-      const response = await fetch(`http://localhost:5000/api/groupe/${id}/membres/${memberId}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
-        setMembres(prev => prev.filter(m => Number(m.id) !== Number(memberId)));
-        socket.emit('user_kicked', { groupId: id, kickedId: memberId });
-        alert("✅ Membre retiré");
-      } else {
-        alert("Erreur lors du retrait");
+const handleKick = async (memberId) => {
+  if (Number(memberId) === Number(userId)) {
+    return alert("Tu ne peux pas te retirer toi-même !");
+  }
+  
+  if (!window.confirm(`Retirer définitivement ce membre du groupe ?`)) return;
+  
+  const token = localStorage.getItem('token');
+  
+  try {
+    // ✅ URL corrigée + token envoyé
+    const response = await fetch(`http://localhost:5000/api/groupe/${id}/membres/${memberId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
       }
-    } catch (err) {
-      console.error("❌ Erreur kick:", err);
-      alert("Erreur de connexion");
+    });
+
+    if (response.ok) {
+      setMembres(prev => prev.filter(m => Number(m.id) !== Number(memberId)));
+      socket.emit('user_kicked', { groupId: id, kickedId: memberId });
+      alert("✅ Membre retiré");
+    } else {
+      const errorData = await response.json();
+      alert("Erreur: " + (errorData.message || "Erreur lors du retrait"));
     }
-  };
+  } catch (err) {
+    console.error("❌ Erreur kick:", err);
+    alert("Erreur de connexion");
+  }
+};
 
   const rejoindreGroupe = async () => {
     try {
@@ -401,9 +419,66 @@ const GroupePage = () => {
 
   const pinnedMessage = messages.find(m => m.est_epinglé);
 
+
+// 🔍 Recherche d'étudiants par nom/email
+const handleMemberSearch = async (value) => {
+  setSearchTerm(value);
+  
+  if (value.length < 2) {
+    setSearchResults([]);
+    setShowSearchResults(false);
+    return;
+  }
+  
+  const token = localStorage.getItem('token');
+  
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/users/search?q=${encodeURIComponent(value)}`,
+      { headers: { 'Authorization': `Bearer ${token}` } }
+    );
+    
+    const data = await response.json();
+    setSearchResults(data);
+    setShowSearchResults(true);
+  } catch (err) {
+    console.error('Erreur recherche:', err);
+  }
+};
+
+// 👥 Ajouter un membre sélectionné
+const handleSelectMember = async (userId, userName) => {
+  try {
+    const response = await fetch(`http://localhost:5000/api/groupe/${id}/membres`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({ idEtudiantAjoute: userId })
+    });
+    
+    if (response.ok) {
+      alert(`✅ ${userName} ajouté au groupe !`);
+      setSearchTerm('');
+      setSearchResults([]);
+      setShowSearchResults(false);
+      chargerGroupe(); // Rafraîchir la liste
+    } else {
+      const error = await response.text();
+      alert(`❌ ${error}`);
+    }
+  } catch (err) {
+    alert('Erreur réseau');
+  }
+};
+
+
+
+
+
   return (
-    <div className={`groupe-page ${darkMode ? 'dark' : ''}`}>
-      
+<div className="groupe-page">      
       {/* HEADER */}
       <header className="groupe-header">
         <button className="back-btn" onClick={() => navigate('/home')}>←</button>
@@ -481,24 +556,27 @@ const GroupePage = () => {
             )}
           </div>
           
-          <ul className="membres-list">
-            {membres.map((membre, index) => (
-              <li key={index} className="membre-item">
-                <div className="membre-avatar">
-                  {(membre.nom || '?').charAt(0).toUpperCase()}
-                </div>
-                <div className="membre-info">
-                  <span className="membre-nom">{membre.nom || 'Membre'}</span>
-                  {Number(groupe.id_etudiant) === Number(membre.id) && (
-                    <span className="membre-role admin">👑 Admin</span>
-                  )}
-                </div>
-                {estCreateur && Number(membre.id) !== Number(userId) && (
-                  <button className="kick-btn" onClick={() => handleKick(membre.id)} title="Retirer">✕</button>
-                )}
-              </li>
-            ))}
-          </ul>
+<ul className="membres-list">
+  {membres.map((membre, index) => (
+    <li key={index} className="membre-item">
+      <div className="membre-avatar">
+        {/* 1ère lettre du prénom, ou du nom si le prénom manque */}
+        {(membre.prenom || membre.nom || '?').charAt(0).toUpperCase()}
+      </div>
+      <div className="membre-info">
+        <span className="membre-nom">
+          {membre.prenom} {membre.nom || 'Membre'}
+        </span>
+        {Number(groupe.id_etudiant) === Number(membre.id) && (
+          <span className="membre-role admin">Admin</span>
+        )}
+      </div>
+      {estCreateur && Number(membre.id) !== Number(userId) && (
+        <button className="kick-btn" onClick={() => handleKick(membre.id)} title="Retirer">✕</button>
+      )}
+    </li>
+  ))}
+</ul>
 
           {!estMembre && !estCreateur && (
             <button className="btn-rejoindre" onClick={rejoindreGroupe}>
@@ -599,20 +677,47 @@ const GroupePage = () => {
               <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
             </div>
             <div className="modal-body">
-              <div className="add-member-section">
-                <label>Ajouter un étudiant par ID :</label>
-                <div className="add-member-input">
-                  <input 
-                    type="text" 
-                    placeholder="Ex: 5" 
-                    value={newMemberId}
-                    onChange={(e) => setNewMemberId(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddMember()}
-                  />
-                  <button onClick={handleAddMember}>Ajouter</button>
-                </div>
-                <small className="help-text">💡 L'ID se trouve dans la liste des membres ci-dessous</small>
-              </div>
+<div className="add-member-section">
+  <label>Ajouter un étudiant :</label>
+  
+  <div className="search-input-wrapper" style={{ position: 'relative' }}>
+    <input
+      type="text"
+      placeholder="Nom, prénom ou email..."
+      value={searchTerm}
+      onChange={(e) => handleMemberSearch(e.target.value)}
+      onFocus={() => searchResults.length > 0 && setShowSearchResults(true)}
+      onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
+      className="member-search-input"
+    />
+    
+    {showSearchResults && searchResults.length > 0 && (
+      <div className="search-results-dropdown">
+        {searchResults.map(user => (
+          <div 
+            key={user.id_etudiant} 
+            className="search-result-item"
+            onClick={() => handleSelectMember(user.id_etudiant, `${user.prenom} ${user.nom}`)}
+          >
+            <div className="result-avatar">
+              {user.prenom?.[0]}{user.nom?.[0]}
+            </div>
+            <div className="result-info">
+              <div className="result-name">{user.prenom} {user.nom}</div>
+              <div className="result-meta">{user.email} • {user.filiere} {user.niveau}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+    
+    {showSearchResults && searchResults.length === 0 && searchTerm.length >= 2 && (
+      <div className="search-no-results">Aucun étudiant trouvé</div>
+    )}
+  </div>
+  
+  <small className="help-text">💡 Tapez au moins 2 caractères pour rechercher</small>
+</div>
 
               <hr />
 

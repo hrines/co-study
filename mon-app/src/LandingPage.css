@@ -1,77 +1,135 @@
-/* --- REGLES GLOBAUX --- */
-.landing-wrapper-v2 {
+/* ==========================================
+   CO'STUDY - LANDING PAGE (STRICT REM & FORMAT)
+   ========================================== */
+
+.landing-wrapper {
   min-height: 100vh;
-  background-color: var(--gris-fond); /* Le gris clair */
+  background-color: var(--gris-fond);
   color: var(--text-main);
   overflow-x: hidden;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
 }
 
 * {
-  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; /* Police moderne pour Co'study */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* --- BARRE DE PROGRESSION HORIZONTALE --- */
+/* BARRE DE PROGRESSION */
 .scroll-progress-container {
   position: fixed;
-  top: 5rem; /* Doit être égal à la hauteur (height) de .modern-nav */
+  top: 5rem;
   left: 0;
   width: 100%;
-  height: 4px;
-  background-color: var(--border-color);
-  z-index: 2001; /* Un cran au-dessus du nav pour être bien visible */
+  height: 0.1875rem;
+  background-color: rgba(17, 43, 60, 0.08);
+  z-index: 2001;
 }
 
 .scroll-progress-bar {
   height: 100%;
-  width: 0%; /* Commence à 0%, GSAP gère la suite */
-  background-color: var(--orange-accent); /* Ta couleur orange vif */
-  border-radius: 0 4px 4px 0;
+  width: 0%;
+  background: linear-gradient(90deg, var(--bleu-moyen), var(--orange-accent));
+  border-radius: 0 0.1875rem 0.1875rem 0;
 }
-/* --- NAVIGATION FIXE --- */
+
+/* NAVIGATION */
 .modern-nav {
-  position: fixed; /* Changé de absolute à fixed */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 5rem;
-  z-index: 2000; /* Augmenté pour passer au-dessus de la barre de progression et des post-it */
+  z-index: 2000;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 8%;
-  
-  /* Ajout d'un léger fond flouté pour que le texte reste lisible au scroll */
-  background-color: rgba(239, 239, 239, 0.85); /* Ton gris-fond avec transparence */
-  backdrop-filter: blur(10px); /* Effet moderne de flou derrière la barre */
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: rgba(244, 247, 249, 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 0.0625rem solid rgba(17, 43, 60, 0.06);
 }
-.logo-section { display: flex; align-items: center; gap: 0.8rem; }
-.nav-logo { height: 2.2rem; }
-.logo-text { font-weight: 800; font-size: 1.6rem; color: var(--bleu-fonce); letter-spacing: -1.5px; }
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.logo-text {
+  font-weight: 800;
+  font-size: 1.6rem;
+  color: var(--bleu-fonce);
+  letter-spacing: -0.0625rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+}
 
 .nav-links a {
   text-decoration: none;
-  color: var(--bleu-moyen);
-  margin: 0 1.5rem;
+  color: var(--text-sub);
   font-weight: 500;
-  transition: opacity 0.3s;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
-.nav-links a:hover, .nav-links a.active {
-  opacity: 1;
+.nav-links a:hover,
+.nav-links a.active {
   color: var(--bleu-fonce);
-  font-weight: 700;
 }
 
-/* --- HERO SECTION MODERNE (Full Screen) --- */
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -0.25rem;
+  left: 0;
+  width: 0;
+  height: 0.125rem;
+  background: var(--bleu-moyen);
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+/* BOUTONS */
+.btn-primary {
+  background: var(--bleu-fonce);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.btn-primary:hover {
+  background: var(--bleu-moyen);
+  transform: translateY(-0.125rem);
+  box-shadow: 0 0.5rem 1.25rem rgba(17, 43, 60, 0.2);
+}
+
+/* HERO */
 .hero-modern {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-top: 5rem;
+  background: linear-gradient(135deg, var(--bleu-moyen) 0%, var(--bleu-fonce) 100%);
+  position: relative;
 }
 
-.hero-split {
+.hero-content {
   max-width: 1300px;
   width: 100%;
   margin: 0 auto;
@@ -79,154 +137,259 @@
   align-items: center;
   gap: 5%;
   padding: 0 5%;
+  z-index: 2;
 }
 
-/* Colonne GAUCHE (Flèche) */
-.visual-column { flex: 1.2; }
+.visual-column {
+  flex: 1.2;
+}
 
 .arrow-shape {
   width: 100%;
-  height: 550px;
-  background: linear-gradient(135deg, var(--bleu-moyen), #1e3a8a); /* Tes bleus du :root */
+  height: 34.375rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(0.625rem);
   border-radius: 2rem;
-  /* Forme de flèche pointant vers le texte */
   clip-path: polygon(0% 0%, 85% 0%, 100% 50%, 85% 100%, 0% 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.2);
 }
 
 .logo-placeholder {
   font-size: 12rem;
   font-weight: 900;
-  color: rgba(255, 255, 255, 0.1); /* "C" Géant et transparent */
+  color: rgba(255, 255, 255, 0.15);
 }
 
-/* Colonne DROITE (Texte) */
-.text-column { flex: 1; }
+.text-column {
+  flex: 1;
+}
 
 .main-title {
   font-size: 4rem;
   font-weight: 900;
   line-height: 1.05;
-  color: var(--text-main); /* Ton bleu foncé */
+  color: white;
   margin-bottom: 2rem;
-  letter-spacing: -2px;
+  letter-spacing: -0.125rem;
+  text-shadow: 0 0.25rem 1.25rem rgba(0, 0, 0, 0.3);
 }
 
-.main-title span { color: var(--bleu-moyen); }
+.main-title span {
+  color: var(--orange-accent);
+}
 
 .hero-description {
   font-size: 1.25rem;
-  color: var(--text-sub);
+  color: rgba(255, 255, 255, 0.9);
   line-height: 1.7;
   max-width: 90%;
-  opacity: 0.9;
+  margin-bottom: 2.5rem;
 }
 
-/* On change le Hero pour le split. On n'utilise pas ici les boutons "Flow" */
-/* J'ai mis à jour les boutons directement dans le :root */
+/* STATS */
+.stats-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4rem;
+  padding: 5rem 8%;
+  background: linear-gradient(180deg, var(--blanc) 0%, var(--gris-fond) 100%);
+  border-top: 0.0625rem solid rgba(17, 43, 60, 0.06);
+  border-bottom: 0.0625rem solid rgba(17, 43, 60, 0.06);
+}
 
+.stat-card {
+  text-align: center;
+  padding: 2rem;
+}
 
+.stat-number {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: var(--bleu-fonce);
+  line-height: 1;
+  margin-bottom: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
 
+.stat-label {
+  font-size: 0.95rem;
+  color: var(--text-sub);
+  font-weight: 500;
+}
 
+.stat-divider {
+  width: 0.0625rem;
+  height: 5rem;
+  background: linear-gradient(to bottom, transparent, var(--border-color), transparent);
+}
 
-
-
-
-/* --- SECTION À PROPOS (Style Thynk) --- */
+/* À PROPOS */
 .about-modern-section {
-  padding: 100px 8%;
+  padding: 7.5rem 8%;
   background-color: var(--gris-fond);
   display: flex;
   justify-content: center;
-  min-height: 80vh;
 }
 
 .about-frame {
   width: 100%;
   max-width: 1100px;
-  border: 1px solid var(--border-color); /* Cadre fin comme ton image */
-  border-radius: 40px;
-  padding: 80px 40px;
+  border: 0.0625rem solid rgba(17, 43, 60, 0.08);
+  border-radius: 2.5rem;
+  padding: 6.25rem 3.75rem;
   position: relative;
   background: var(--blanc);
   text-align: center;
+  box-shadow: 0 1.25rem 3.75rem rgba(17, 43, 60, 0.06);
 }
 
-/* Les bulles bleues flottantes */
 .dot {
   position: absolute;
-  width: 120px;
-  height: 120px;
-  background-color: #004cff; /* Le bleu vif de ton image Thynk */
+  width: 6.25rem;
+  height: 6.25rem;
+  background: var(--bleu-moyen);
   border-radius: 50%;
+  opacity: 0.08;
   z-index: 1;
 }
 
 .dot-top {
-  top: -40px;
-  right: -30px;
+  top: -1.875rem;
+  right: -1.25rem;
 }
 
 .dot-bottom {
-  bottom: 80px;
-  left: -40px;
+  bottom: 3.75rem;
+  left: -1.875rem;
 }
 
 .frame-content {
   position: relative;
-  z-index: 2; /* Pour passer par-dessus les bulles */
+  z-index: 2;
 }
 
 .frame-title {
-  font-size: 3.5rem;
+  font-size: 3rem;
   font-weight: 800;
   color: var(--bleu-fonce);
   margin-bottom: 2rem;
+  line-height: 1.2;
 }
 
 .frame-title span {
   display: block;
   font-weight: 400;
+  color: var(--text-sub);
+  margin-top: 0.5rem;
 }
 
 .frame-description {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: var(--text-sub);
-  max-width: 700px;
-  margin: 0 auto 3rem auto;
-  line-height: 1.6;
+  max-width: 750px;
+  margin: 0 auto 1.5rem auto;
+  line-height: 1.8;
 }
 
-.btn-know-more {
-  background-color: #004cff;
+/* SECTION IMAGE */
+.image-banner-section {
+  position: relative;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url('/images/university-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(17, 43, 60, 0.8);
+}
+
+.banner-text {
+  position: relative;
+  z-index: 2;
+  text-align: center;
   color: white;
-  border: none;
-  padding: 15px 35px;
-  border-radius: 50px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.2s;
+  padding: 2rem;
 }
 
-.btn-know-more:hover {
-  transform: scale(1.05);
+.banner-text h2 {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  text-shadow: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.3);
 }
 
+.banner-text p {
+  font-size: 1.5rem;
+  font-weight: 300;
+  opacity: 0.9;
+}
 
+/* CITATION */
+.quote-section {
+  padding: 7.5rem 8%;
+  background: var(--bleu-fonce);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-bottom: 0.0625rem solid rgba(17, 43, 60, 0.06);
+}
 
+.quote-content {
+  max-width: 900px;
+  position: relative;
+  z-index: 2;
+}
 
-/* --- SECTION ÉTAPES (POST-IT) --- */
+.quote-icon {
+  font-size: 5rem;
+  color: var(--orange-accent);
+  line-height: 1;
+  margin-bottom: -1.25rem;
+  font-family: Georgia, serif;
+  font-style: italic;
+}
+
+.quote-text {
+  font-size: 2rem;
+  color: var(--text-sub);
+  font-weight: 300;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+  font-style: italic;
+}
+
+.quote-author {
+  font-size: 1.1rem;
+  color: var(--text-sub);
+  font-weight: 500;
+  letter-spacing: 0.03125rem;
+}
+
+/* ACTIVITÉS */
 .steps-container {
-  padding: 80px 8%;
+  padding: 7.5rem 8%;
   text-align: center;
   background-color: var(--gris-fond);
 }
 
 .steps-container h2 {
   font-size: 2.5rem;
-  margin-bottom: 50px;
+  margin-bottom: 3.75rem;
   color: var(--bleu-fonce);
   font-weight: 800;
 }
@@ -234,200 +397,142 @@
 .steps-grid {
   display: flex;
   justify-content: center;
-  gap: 30px;
+  gap: 2rem;
   flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .step-card {
-  width: 300px;
-  padding: 40px 30px;
-  border-radius: 5px; /* Coins légèrement arrondis comme un post-it */
-  box-shadow: 10px 10px 20px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
+  width: 20rem;
+  padding: 3.125rem 2.1875rem;
+  border-radius: 1rem;
+  box-shadow: 0 0.625rem 2.5rem rgba(17, 43, 60, 0.08);
+  transition: all 0.4s ease;
   position: relative;
+  background: var(--blanc);
+  text-align: left;
 }
 
 .step-card:hover {
-  transform: translateY(-10px) rotate(2deg);
+  transform: translateY(-0.5rem);
+  box-shadow: 0 1.25rem 3.75rem rgba(17, 43, 60, 0.12);
 }
 
-/* Couleurs des Post-it basées sur ton image */
-.card-blue { background-color: #D1E9F6; border-bottom: 5px solid #3498db; }
-.card-yellow { background-color: #FFF9C4; border-bottom: 5px solid #f1c40f; }
-.card-green { background-color: #DCEDC8; border-bottom: 5px solid #2ecc71; }
-
 .step-number {
-  display: block;
-  font-weight: 700;
-  font-size: 0.9rem;
+  display: inline-block;
+  font-weight: 800;
+  font-size: 0.85rem;
   text-transform: uppercase;
-  margin-bottom: 15px;
-  color: rgba(0,0,0,0.5);
+  letter-spacing: 0.0625rem;
+  margin-bottom: 1.25rem;
+  color: var(--bleu-moyen);
+  padding: 0.375rem 0.875rem;
+  background: rgba(32, 83, 117, 0.08);
+  border-radius: 0.375rem;
 }
 
 .step-card h3 {
-  font-size: 1.5rem;
-  margin-bottom: 15px;
-  color: #333;
+  font-size: 1.4rem;
+  margin-bottom: 0.9375rem;
+  color: var(--bleu-fonce);
+  font-weight: 700;
 }
 
 .step-card p {
-  color: #666;
-  line-height: 1.5;
-}
-/* --- STYLE DE BASE DES POST-IT --- */
-.step-card {
-  width: 300px;
-  padding: 40px 30px;
-  border-radius: 2px; /* Coins plus vifs pour l'effet papier */
-  box-shadow: 5px 5px 15px rgba(0,0,0,0.1); /* Ombre légère au repos */
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animation fluide */
-  position: relative;
+  color: var(--text-sub);
+  line-height: 1.7;
+  font-size: 0.95rem;
 }
 
-/* --- L'EFFET HOVER (SURVOL) --- */
-.step-card:hover {
-  transform: translateY(-15px) rotate(3deg) scale(1.05); /* Se soulève, tourne et grandit */
-  box-shadow: 15px 20px 30px rgba(0,0,0,0.15); /* Ombre portée plus profonde */
-  z-index: 10; /* Passe au-dessus des autres */
+.card-blue {
+  border-top: 0.25rem solid var(--bleu-moyen);
 }
 
-/* Couleurs avec une petite bordure en bas pour le relief */
-.card-blue { 
-  background-color: #D1E9F6; 
-  border-bottom: 8px solid rgba(52, 152, 219, 0.3); 
-}
-.card-yellow { 
-  background-color: #FFF9C4; 
-  border-bottom: 8px solid rgba(241, 196, 15, 0.3); 
-}
-.card-green { 
-  background-color: #DCEDC8; 
-  border-bottom: 8px solid rgba(46, 204, 113, 0.3); 
+.card-yellow {
+  border-top: 0.25rem solid var(--orange-accent);
 }
 
-/* Optionnel : Un petit effet de "pli" sur le coin en bas à droite */
-.step-card::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  border-width: 0 0 20px 20px;
-  border-style: solid;
-  border-color: transparent transparent var(--gris-fond) transparent;
-  transition: all 0.4s ease;
+.card-green {
+  border-top: 0.25rem solid #2ecc71;
 }
 
-.step-card:hover::after {
-  border-width: 0 0 30px 30px; /* Le pli s'agrandit au survol */
-}
-
-
-/* --- SECTION ACTION SOUS LES POST-IT --- */
 .steps-action {
-  margin-top: 60px; /* Espace avec les post-it */
+  margin-top: 4.375rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
+  gap: 0.9375rem;
 }
 
-/* On réutilise ta classe orange mais en plus grand */
 .big-cta {
-  padding: 18px 45px !important; /* Plus imposant */
-  font-size: 1.2rem !important;
-  box-shadow: 0 10px 20px rgba(246, 107, 14, 0.2); /* Petite lueur orange */
-  transition: all 0.3s ease;
-}
-
-.big-cta:hover {
-  transform: scale(1.05);
-  box-shadow: 0 15px 30px rgba(246, 107, 14, 0.4);
+  padding: 1rem 3rem !important;
+  font-size: 1.1rem !important;
 }
 
 .sub-text {
   font-size: 0.9rem;
   color: var(--text-sub);
   font-style: italic;
-  opacity: 0.8;
 }
 
-
-
-/* --- FOOTER STYLE --- */
-.main-footer {
-  background-color: var(--bleu-fonce); /* #112B3C */
-  color: #ffffff;
-  padding: 80px 8% 20px 8%;
-  margin-top: 100px;
-}
-
-.footer-content {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr; /* La colonne marque est plus large */
-  gap: 50px;
-  padding-bottom: 50px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.footer-column h3 {
-  color: var(--orange-accent); /* #F66B0E */
-  font-size: 1.4rem;
-  margin-bottom: 25px;
-  font-weight: 700;
-}
-
-.footer-desc {
-  line-height: 1.7;
-  opacity: 0.8;
-  margin-top: 15px;
-  max-width: 350px;
-}
-
-.footer-column ul {
-  list-style: none;
-  padding: 0;
-}
-
-.footer-column ul li {
-  margin-bottom: 12px;
-}
-
-.footer-column ul li a {
-  color: #ffffff;
-  text-decoration: none;
-  opacity: 0.7;
-  transition: 0.3s;
-}
-
-.footer-column ul li a:hover {
-  opacity: 1;
-  color: var(--orange-accent);
-  padding-left: 5px;
-}
-
-.social-links {
-  margin-top: 20px;
-  display: flex;
-  gap: 15px;
-  font-size: 1.5rem;
-}
-
-/* Bande de copyright en bas */
-.footer-bottom {
-  text-align: center;
-  padding-top: 30px;
-  font-size: 0.9rem;
-  opacity: 0.5;
-}
-
-/* Adaptation pour mobile */
-@media (max-width: 768px) {
-  .footer-content {
-    grid-template-columns: 1fr;
-    text-align: center;
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .hero-content {
+    flex-direction: column;
+    padding: 6.25rem 5% 3.75rem 5%;
+    gap: 2rem;
   }
-  .footer-desc {
-    margin: 15px auto;
+  .visual-column {
+    width: 100%;
+  }
+  .arrow-shape {
+    height: 20rem;
+  }
+  .main-title {
+    font-size: 3rem;
+  }
+  .stats-section {
+    flex-direction: column;
+    gap: 3rem;
+  }
+  .stat-divider {
+    width: 5rem;
+    height: 0.0625rem;
+  }
+  .about-frame {
+    padding: 3.75rem 1.875rem;
+  }
+  .frame-title {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .modern-nav {
+    padding: 0 5%;
+  }
+  .nav-links {
+    display: none;
+  }
+  .main-title {
+    font-size: 2.5rem;
+  }
+  .stat-number {
+    font-size: 2.8rem;
+  }
+  .steps-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+  .step-card {
+    width: 100%;
+    max-width: 21.875rem;
+  }
+  .quote-text {
+    font-size: 1.4rem;
+  }
+  .banner-text h2 {
+    font-size: 2rem;
   }
 }
