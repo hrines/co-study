@@ -1,0 +1,13 @@
+<mxfile host="65bd71144e">
+    <diagram id="YKR0h6Wu536YKQt5TDMT" name="Page-1">
+        <mxGraphModel dx="1003" dy="766" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="+------------------+&#xa;                    |    Étudiant      |&#xa;                    +------------------+&#xa;                             |&#xa;        ------------------------------------------------&#xa;        |                 |                |            |&#xa;        v                 v                v            v&#xa;&#xa;&#xa;+----------------+  +----------------+  +-------------------+  +------------------+&#xa;| S&#39;inscrire     |  | Se connecter   |  | Modifier profil   |  | Consulter profil |&#xa;+----------------+  +----------------+    +------------------+&#xa;        |                    |                  &#xa;        |                    |                  &#xa;        v                    v                    &#xa; remplir infos        vérifier email     &#xa; nom/prénom           mot de passe         &#xa; email                rôle                 &#xa; question secrète     statut              &#xa; réponse secrète                            &#xa;&#xa;&#xa;                             |&#xa;                             v&#xa;                    +------------------+&#xa;                    | Gérer notifications |&#xa;                    +------------------+&#xa;&#xa;&#xa;                             |&#xa;                             v&#xa;                    +------------------+&#xa;                    | Récupérer compte |&#xa;                    +------------------+&#xa;                             |&#xa;                             v&#xa;                  utiliser question secrète" style="text;whiteSpace=wrap;" vertex="1" parent="1">
+                    <mxGeometry x="50" y="110" width="580" height="590" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

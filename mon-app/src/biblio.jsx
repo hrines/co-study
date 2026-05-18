@@ -5,6 +5,13 @@ import { useNavigate } from 'react-router-dom';
 
 
 const Biblio = () => {
+    const getUserAuth = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return {
+    userId: user.id_etudiant || localStorage.getItem('userId'),
+    token: localStorage.getItem('token')
+  };
+};
     const navigate = useNavigate();
     const [fichiers, setFichiers] = useState([]);
     const [favorisIds, setFavorisIds] = useState([]);
@@ -12,9 +19,6 @@ const Biblio = () => {
     const [modulesOuverts, setModulesOuverts] = useState({});
     
     const fileInputRef = useRef(null);
-    // Remplace tes lignes 11 et 22 par une seule source de vérité
-    const userId = localStorage.getItem('userId'); 
-    const token = localStorage.getItem('token');
     const categories = ['Cours', 'TD', 'TP', 'Résumés', 'Test', 'Examen'];
 
     const toggleModule = (catName, moduleName) => {
@@ -27,26 +31,37 @@ const Biblio = () => {
 
  
 useEffect(() => {
-    // 1. Charger tous les fichiers valides
-fetch('http://localhost:5000/api/fichiers?statut=valide')        .then(res => res.json())
-        .then(data => setFichiers(Array.isArray(data) ? data : []))
-        .catch(err => console.error(err));
+  // 1. Charger les fichiers (toujours public)
+  fetch('http://localhost:5000/api/fichiers?statut=valide')
+    .then(res => res.json())
+    .then(data => setFichiers(Array.isArray(data) ? data : []))
+    .catch(err => console.error("Erreur fichiers:", err));
 
-    // 2. Charger les favoris de l'utilisateur actuel
-    if (userId && token) {
-        fetch(`http://localhost:5000/api/favoris/${userId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-            .then(res => res.json())
-            .then(data => {
-                // On s'assure que data est bien un tableau avant de mapper
-                if (Array.isArray(data)) {
-                    setFavorisIds(data.map(f => f.id_fichier));
-                }
-            })
-            .catch(err => console.error("Erreur chargement favoris:", err));
-    }
-}, [userId, token]);
+  // 2. Charger les favoris avec userId/token dynamiques
+  const { userId, token } = getUserAuth();
+  
+  if (userId && token) {
+    fetch(`http://localhost:5000/api/favoris/${userId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Session invalide");
+      return res.json();
+    })
+    .then(data => {
+      if (Array.isArray(data)) {
+        //  Extrait les id_fichier depuis la réponse JOIN
+        const ids = data.map(f => f.id_fichier).filter(id => id);
+        console.log("✅ Favoris chargés:", ids);
+        setFavorisIds(ids);
+      }
+    })
+    .catch(err => {
+      console.warn("Favoris non chargés:", err.message);
+      setFavorisIds([]);
+    });
+  }
+}, []); 
 
     const handleDropzoneClick = () => {
         fileInputRef.current.click();
@@ -122,43 +137,54 @@ const uploadFile = async (file) => {
     }
 };
 
-console.log("ID récupéré :", userId);
-console.log("Token récupéré :", token);
+//console.log("ID récupéré :", userId);
+//console.log("Token récupéré :", token);
+
+// 🔑 Fonction sécurisée pour récupérer l'ID à la volée
+const getUserId = () => {
+  let id = localStorage.getItem('userId');
+  if (id) return id;
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    return user?.id_etudiant || user?.id || null;
+  } catch (e) { return null; }
+};
 
 const toggleFavori = async (idFichier) => {
-    if (!userId || !token) {
-        alert("Tu dois être connecté pour ajouter des favoris !");
-        return;
-    }
+  const { userId, token } = getUserAuth();
+  
+  if (!userId || !token) {
+    alert("Connecte-toi d'abord !");
+    navigate('/login');
+    return;
+  }
 
-    const isFavori = favorisIds.includes(idFichier);
-    const method = isFavori ? 'DELETE' : 'POST';
-    
-    try {
-        const response = await fetch('http://localhost:5000/api/favoris', {
-            method: method,
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ 
-                id_etudiant: userId, 
-                id_fichier: idFichier 
-            })
-        });
+  const isFavori = favorisIds.includes(idFichier);
+  
+  try {
+    const response = await fetch('http://localhost:5000/api/favoris', {
+      method: isFavori ? 'DELETE' : 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ 
+        id_etudiant: userId, 
+        id_fichier: idFichier 
+      })
+    });
 
-        if (response.ok) {
-            setFavorisIds(prev => 
-                isFavori 
-                ? prev.filter(id => id !== idFichier) 
-                : [...prev, idFichier]
-            );
-        } else {
-            console.error("Erreur API Favoris:", response.status);
-        }
-    } catch (err) {
-        console.error("Erreur réseau favoris:", err);
+    if (response.ok) {
+      //  Met à jour l'état local immédiatement
+      setFavorisIds(prev => 
+        isFavori 
+          ? prev.filter(id => id !== idFichier) 
+          : [...prev, idFichier]
+      );
     }
+  } catch (err) {
+    console.error("Erreur favori:", err);
+  }
 };
 
     return (

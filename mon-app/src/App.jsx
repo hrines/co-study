@@ -12,14 +12,13 @@ import LandingPage from './LandingPage';
 import Agenda from './agenda';
 import ForgotPassword from './ForgotPassword';
 
-// ✅ LE GARDE DU CORPS : Empêche l'accès à /admin si ce n'est pas le bon mail
+// Empêche l'accès à /admin si ce n'est pas le bon mail
 const AdminGuard = ({ children }) => {
   const user = JSON.parse(localStorage.getItem('user'));
   
   if (!user || user.email !== 'admin@costudy.dz') {
-    return <Navigate to="/home" replace />; // On le dégage vers l'accueil étudiant
+    return <Navigate to="/home" replace />;
   }
-  
   return children;
 };
 
@@ -33,7 +32,7 @@ function App() {
         <Route path="/signup" element={<Authentification />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         
-        {/* 🔒 ROUTE ADMIN PROTÉGÉE */}
+        {/*ROUTE ADMIN PROTÉGÉE */}
         <Route path="/admin" element={
           <AdminGuard>
             <AdminSy />

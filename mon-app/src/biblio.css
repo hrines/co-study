@@ -266,6 +266,8 @@ body {
 
 .star-btn.active {
   color: var(--orange-accent); /* Orange quand actif */
+  transform: scale(1.2);
+
 }
 
 .view-link {

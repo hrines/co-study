@@ -1,19 +1,15 @@
-/* ==========================================
-   SERVER.JS - CO'STUDY BACKEND (COMPLET)
-   ========================================== */
-
-const express = require('express');
-const cors = require('cors');
-const mysql = require('mysql2');
-const http = require('http');
-const { Server } = require('socket.io');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const multer = require('multer');
+const express = require('express'); // Framework web
+const cors = require('cors');  // Sécurité cross-origin
+const mysql = require('mysql2'); // Base de données
+const http = require('http'); // Serveur HTTP
+const { Server } = require('socket.io'); // Temps réel (chat)
+const bcrypt = require('bcrypt'); // Cryptage mots de passe
+const jwt = require('jsonwebtoken');  // Tokens d'authentification
+const multer = require('multer');  // Upload fichiers
 const path = require('path');
 const fs = require('fs');
 
-// ========== CONFIGURATION ==========
+// CONFIGURATION 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -22,10 +18,10 @@ const io = new Server(server, {
     }
 });
 const PORT = 5000;
-const JWT_SECRET = 'ma_cle_secrete_123'; // 🔐 À mettre dans un .env en prod !
+const JWT_SECRET = 'ma_cle_secrete_123'; 
 const FRONTEND_URL = "http://localhost:5173";
 
-// ========== MIDDLEWARES ==========
+//  MIDDLEWARES
 app.use(cors({
   origin: FRONTEND_URL,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
@@ -47,7 +43,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ========== CONNEXION BDD ==========
+// CONNEXION BDD 
 const db = mysql.createPool({
   host: 'localhost',
   user: 'root',
@@ -64,9 +60,7 @@ db.getConnection((err, connection) => {
   }
 });
 
-// ==========================================
-// 🔐 MIDDLEWARES D'AUTHENTIFICATION
-// ==========================================
+//  MIDDLEWARES D'AUTHENTIFICATION
 
 // Middleware de vérification de token (utilisateur)
 const verifyToken = (req, res, next) => {
@@ -80,7 +74,7 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-// ✅ Middleware de vérification ADMIN (AJOUTÉ ICI - avant toute route qui l'utilise)
+//  Middleware de vérification ADMIN
 const verifyAdmin = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return res.status(403).json({ message: "Token manquant" });
@@ -88,7 +82,7 @@ const verifyAdmin = (req, res, next) => {
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) return res.status(401).json({ message: "Token invalide" });
     
-    // ✅ Vérification par email admin
+    //  Vérification par email admin
     if (decoded.email !== 'admin@costudy.dz') {
       return res.status(403).json({ message: "Accès admin requis" });
     }
@@ -98,10 +92,7 @@ const verifyAdmin = (req, res, next) => {
   });
 };
 
-// ==========================================
-// 🔐 ROUTES D'AUTHENTIFICATION
-// ==========================================
-
+//  ROUTES D'AUTHENTIFICATION
 // Inscription avec Question de Sécurité générée
 app.post('/api/signup', async (req, res) => {
   const { 
@@ -146,9 +137,9 @@ app.post('/api/login', (req, res) => {
     if (err) return res.status(500).json({ message: "Erreur serveur" });
     if (result.length === 0) return res.status(401).json({ message: "Email ou mot de passe incorrect" });
     
-    const user = result[0]; // ← Déclaré EN PREMIER !
+    const user = result[0]; 
     
-    console.log("Utilisateur trouvé en BDD:", user); // ✅ Maintenant ça marche
+    console.log("Utilisateur trouvé en BDD:", user); 
     
     const match = await bcrypt.compare(mot_de_passe, user.mot_de_passe);
     
@@ -169,10 +160,7 @@ res.status(200).json({
   });
 });
 
-// ==========================================
-// 🔐 RÉCUPÉRATION MOT DE PASSE
-// ==========================================
-
+//  RÉCUPÉRATION MOT DE PASSE
 // Route 1 : Récupérer la question de sécurité par email
 app.get('/api/forgot-password/:email', (req, res) => {
   const { email } = req.params;
@@ -223,10 +211,7 @@ app.post('/api/reset-password', async (req, res) => {
   );
 });
 
-// ==========================================
-// 👥 ROUTES UTILISATEURS
-// ==========================================
-
+//  ROUTES UTILISATEURS
 // Récupérer utilisateurs (avec filtres)
 app.get('/api/users', (req, res) => {
   const { filiere, niveau } = req.query;
@@ -264,17 +249,15 @@ app.get('/api/profil/:id_etudiant', (req, res) => {
   });
 });
 
-// ==========================================
-// 🔔 ROUTES NOTIFICATIONS
-// ==========================================
-
+//  ROUTES NOTIFICATIONS
+// recupere les notifs d'un user 
 app.get('/api/notifications/:userId', verifyToken, (req, res) => {
   const queryUserId = req.userId || req.params.userId;
   db.query("SELECT * FROM notifications WHERE id_etudiant = ? ORDER BY created_at DESC", [queryUserId], 
     (err, data) => err ? res.status(500).json({ error: err.message }) : res.json(data)
   );
 });
-
+// Marquer une notification comme lue
 app.put('/api/notifications/:id/lu', verifyToken, (req, res) => {
   db.query("UPDATE notifications SET lu = 1 WHERE id = ?", [req.params.id], 
     (err) => err ? res.status(500).json({ message: 'Erreur' }) : res.json({ message: 'Notification lue' })
@@ -301,10 +284,7 @@ app.post('/api/notifications', verifyToken, (req, res) => {
   );
 });
 
-// ==========================================
-// 📁 ROUTES FICHIERS & UPLOAD
-// ==========================================
-
+//  ROUTES FICHIERS & UPLOAD
 app.post('/api/upload', verifyToken, upload.single('fichier'), (req, res) => {
   if (!req.file) return res.status(400).send("Aucun fichier reçu.");
   
@@ -366,7 +346,6 @@ app.delete('/api/fichiers/:id', (req, res) => {
     (err) => err ? res.status(500).json({ error: err.message }) : res.json({ message: "Fichier supprimé" })
   );
 });
-
 // Modifier le nom d'un fichier
 app.put('/api/fichiers/:id/rename', verifyToken, (req, res) => {
   const { nouveau_nom } = req.body;
@@ -390,8 +369,8 @@ app.put('/api/fichiers/:id/rename', verifyToken, (req, res) => {
 
 // Favoris
 app.post('/api/favoris', (req, res) => {
-  db.query("INSERT INTO favoris (id_etudiant, id_fichier) VALUES (?, ?)", 
-    [req.body.id_etudiant, req.body.id_fichier], 
+db.query("INSERT IGNORE INTO favoris (id_etudiant, id_fichier) VALUES (?, ?)", 
+      [req.body.id_etudiant, req.body.id_fichier], 
     (err) => err ? res.status(500).send(err) : res.json({ message: "Ajouté aux favoris" })
   );
 });
@@ -410,10 +389,7 @@ app.get('/api/favoris/:id_etudiant', (req, res) => {
   );
 });
 
-// ==========================================
-// 👥 ROUTES GROUPES
-// ==========================================
-
+//  ROUTES GROUPES
 // Créer groupe
 app.post('/api/create-group', verifyToken, (req, res) => {
   const { nom_groupe, description, filiere, type_cursus, niveau, id_etudiant } = req.body;
@@ -432,12 +408,28 @@ app.post('/api/create-group', verifyToken, (req, res) => {
   );
 });
 
-// Groupes par niveau (public)
+// Groupes par niveau
+// Dans server.js - Route /api/groupes/:niveau
 app.get('/api/groupes/:niveau', (req, res) => {
-  db.query("SELECT * FROM groupes WHERE niveau = ? AND filiere = ? AND etat = 'valide'", 
-    [req.params.niveau, req.query.filiere], 
-    (err, results) => err ? res.status(500).send({ message: 'Erreur' }) : res.json(results)
-  );
+  const { niveau } = req.params;
+  const { filiere } = req.query;
+  // Si filiere n'est pas fournie ou invalide, on ne filtre pas dessus
+  let sql = "SELECT * FROM groupes WHERE niveau = ? AND etat = 'valide'";
+  const params = [niveau];
+  
+  if (filiere && filiere !== 'undefined' && filiere !== 'null') {
+    sql += " AND filiere = ?";
+    params.push(filiere);
+  }
+  
+  db.query(sql, params, (err, results) => {
+    if (err) {
+      console.error("❌ Erreur SQL groupes:", err);
+      return res.status(500).json({ error: err.message });
+    }
+    console.log("✅ Groupes trouvés:", results.length);
+    res.json(results);
+  });
 });
 
 // Mes groupes
@@ -471,7 +463,7 @@ app.get('/api/groupe/:id', (req, res) => {
 // Créer une séance de révision
 app.post('/api/groupes/:id/seances', verifyToken, (req, res) => {
   const { id: idGroupe } = req.params;
-  const { titre, description, date_seance, lieu } = req.body;
+  const { titre, description, date_seance } = req.body;
   const idCreateur = req.userId;
   
   db.query("SELECT id_etudiant FROM groupes WHERE id_groupe = ? AND id_etudiant = ?", [idGroupe, idCreateur], (err, result) => {
@@ -479,8 +471,8 @@ app.post('/api/groupes/:id/seances', verifyToken, (req, res) => {
       return res.status(403).json({ message: "Accès refusé : seul le créateur peut annoncer une séance." });
     }
     
-    db.query("INSERT INTO seances_revision (id_groupe, id_createur, titre, description, date_seance, lieu) VALUES (?, ?, ?, ?, ?, ?)", 
-      [idGroupe, idCreateur, titre, description, date_seance, lieu], (err, result) => {
+    db.query("INSERT INTO seances_revision (id_groupe, id_createur, titre, description, date_seance) VALUES (?, ?, ?, ?, ?)", 
+      [idGroupe, idCreateur, titre, description, date_seance], (err, result) => {
         if (err) return res.status(500).json({ message: "Erreur création" });
         
         const idSeance = result.insertId;
@@ -490,7 +482,7 @@ app.post('/api/groupes/:id/seances', verifyToken, (req, res) => {
             const dateFr = new Date(date_seance).toLocaleDateString('fr-FR', { 
               weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' 
             });
-            const notifMsg = `📅 Nouvelle séance : "${titre}"\n🗓️ ${dateFr}\n📍 ${lieu || 'Lieu à définir'}`;
+            const notifMsg = `📅 Nouvelle séance : "${titre}"\n🗓️ ${dateFr}`;
             
             members.forEach(m => {
               db.query("INSERT INTO notifications (id_etudiant, message, type, id_reference) VALUES (?, ?, 'seance_revision', ?)", 
@@ -503,8 +495,6 @@ app.post('/api/groupes/:id/seances', verifyToken, (req, res) => {
       });
   });
 });
-
-
 
 // Récupérer les séances d'un groupe
 app.get('/api/groupes/:id/seances', (req, res) => {
@@ -556,11 +546,8 @@ app.delete('/api/groupe/:id', verifyToken, (req, res) => {
     exec(0);
   });
 });
-
-// ==========================================
-// 🤝 ROUTES ADHÉSIONS & DEMANDES
-// ==========================================
-
+// ROUTES ADHÉSIONS & DEMANDES
+//responsable 
 app.post('/api/demande-adhesion', (req, res) => {
   const { id_groupe, id_etudiant } = req.body;
   
@@ -626,9 +613,7 @@ app.delete('/api/annuler-demande', (req, res) => {
   );
 });
 
-// ==========================================
-// AJOUTER UN MEMBRE (CRÉATEUR UNIQUEMENT)
-// ==========================================
+// AJOUTER UN MEMBRE (CReATEUR UNIQUEMENT)
 app.post('/api/groupe/:id/membres', verifyToken, (req, res) => {
   const { id } = req.params;
   const { idEtudiantAjoute } = req.body;
@@ -665,10 +650,7 @@ app.post('/api/groupe/:id/membres', verifyToken, (req, res) => {
   });
 });
 
-// ==========================================
-// 👑 ROUTES ADMIN (BASE)
-// ==========================================
-
+//  ROUTES ADMIN (BASE)
 // Stats
 app.get('/api/admin/stats/:filiere/:niveau', (req, res) => {
   const { filiere, niveau } = req.params;
@@ -689,7 +671,7 @@ app.get('/api/admin/stats/:filiere/:niveau', (req, res) => {
     });
   });
 });
-
+//groupes 
 // Groupes en attente
 app.get('/api/admin/pending-groups/:filiere/:niveau', (req, res) => {
   db.query("SELECT * FROM groupes WHERE filiere = ? AND niveau = ? AND etat = 'en_attente'", 
@@ -772,12 +754,8 @@ app.get('/api/admin/pending-registrations', verifyToken, (req, res) => {
   );
 });
 
-// ==========================================
-// 👑 ROUTES ADMIN - GESTION AVANCÉE GROUPES ✨
-// (AJOUTÉES ICI - juste avant server.listen)
-// ==========================================
-
-// 📋 Lister les membres d'un groupe
+// ROUTES ADMIN - GESTION AVANCÉE GROUPES 
+// Lister les membres d'un groupe
 app.get('/api/admin/groupes/:id/membres', verifyAdmin, (req, res) => {
   const sql = `
     SELECT e.id_etudiant as id, e.nom, e.prenom, e.email, e.matricule, 
@@ -806,11 +784,7 @@ app.get('/api/admin/groupes/:id/membres', verifyAdmin, (req, res) => {
     );
   });
 });
-
-
-// ==========================================
-// 🔍 RECHERCHE D'ÉTUDIANTS (pour ajout membre)
-// ==========================================
+// RECHERCHE D'ÉTUDIANTS (pour ajout membre)
 app.get('/api/users/search', verifyToken, (req, res) => {
   const { q } = req.query;
   
@@ -840,9 +814,8 @@ app.get('/api/users/search', verifyToken, (req, res) => {
     }
   );
 });
-// ==========================================
-// 👥 ROUTE POUR CRÉATEUR : Kick un membre
-// ==========================================
+
+// ROUTE POUR CRÉATEUR : Kick un membre
 app.delete('/api/groupe/:id/membres/:memberId', verifyToken, (req, res) => {
   const { id, memberId } = req.params;
   const userId = req.userId;
@@ -890,8 +863,7 @@ app.delete('/api/groupe/:id/membres/:memberId', verifyToken, (req, res) => {
   );
 });
 
-
-// ✏️ Renommer un groupe
+//  Renommer un groupe
 app.put('/api/admin/groupes/:id/rename', verifyAdmin, (req, res) => {
   const { nouveau_nom } = req.body;
   
@@ -922,8 +894,7 @@ app.put('/api/admin/groupes/:id/rename', verifyAdmin, (req, res) => {
     }
   );
 });
-
-// 👑 Changer le rôle d'un membre (membre ↔ responsable)
+//  Changer le rôle d'un membre (membre ↔ responsable)
 app.put('/api/admin/groupes/:groupeId/membres/:etudiantId/role', verifyAdmin, (req, res) => {
   const { groupeId, etudiantId } = req.params;
   const { nouveau_role } = req.body;
@@ -962,8 +933,7 @@ app.put('/api/admin/groupes/:groupeId/membres/:etudiantId/role', verifyAdmin, (r
     }
   );
 });
-
-// 🗑️ Supprimer un groupe (version admin renforcée)
+//  Supprimer un groupe (version admin renforcée)
 app.delete('/api/admin/groupes/:id', verifyAdmin, (req, res) => {
   const groupId = req.params.id;
   
@@ -1006,11 +976,7 @@ app.delete('/api/admin/groupes/:id', verifyAdmin, (req, res) => {
     exec(0);
   });
 });
-
-// ==========================================
-// 💬 ROUTES MESSAGES & CHAT
-// ==========================================
-
+//  ROUTES MESSAGES & CHAT
 app.get('/api/messages/:id_groupe', (req, res) => {
   db.query("SELECT id, auteur, texte, created_at FROM messages WHERE id_groupe = ? ORDER BY created_at ASC", 
     [req.params.id_groupe], 
@@ -1052,11 +1018,7 @@ app.put('/api/messages/:idMessage/epingler', verifyToken, (req, res) => {
     }
   );
 });
-
-// ==========================================
-// 🔍 RECHERCHE GLOBALE
-// ==========================================
-
+//  RECHERCHE GLOBALE
 app.get('/api/search-all', (req, res) => {
   const term = `%${req.query.q}%`;
   
@@ -1070,9 +1032,7 @@ app.get('/api/search-all', (req, res) => {
   });
 });
 
-// ==========================================
-// 📅 AGENDA
-// ==========================================
+//  AGENDA
 
 app.get('/api/agenda/:userId', verifyToken, (req, res) => {
   db.query("SELECT * FROM agenda WHERE id_etudiant = ? ORDER BY date ASC", [req.params.userId], 
@@ -1087,11 +1047,7 @@ app.post('/api/agenda', verifyToken, (req, res) => {
     (err, result) => err ? res.status(500).json(err) : res.json({ message: "Événement ajouté", id: result.insertId })
   );
 });
-
-// ==========================================
-// 🚀 SOCKET.IO (CHAT TEMPS RÉEL)
-// ==========================================
-
+//  SOCKET.IO (CHAT TEMPS RÉEL)
 io.on('connection', (socket) => {
   console.log("🔌 Client connecté:", socket.id);
   
@@ -1121,10 +1077,7 @@ io.on('connection', (socket) => {
   });
 });
 
-// ==========================================
-// 🎬 DÉMARRAGE SERVEUR
-// ==========================================
-
+//  DÉMARRAGE SERVEUR
 server.listen(PORT, () => {
   console.log(`✅ Serveur Co'Study démarré sur http://localhost:${PORT}`);
   console.log(`🌐 Frontend attendu sur ${FRONTEND_URL}`);

@@ -42,28 +42,40 @@ function ForgotPassword() {
   );
 
   // Étape 1 : Trouver le compte par email
-  const handleFindAccount = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+const handleFindAccount = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError('');
+  
+  try {
+    const response = await fetch(`http://localhost:5000/api/forgot-password/${email}`);
+    const data = await response.json();
     
-    try {
-      const response = await fetch(`http://localhost:5000/api/forgot-password/${email}`);
-      const data = await response.json();
+    // 🔍 DEBUG : Affiche ce que le serveur renvoie
+    console.log("📡 Réponse API forgot-password:", data);
+    
+    if (response.ok) {
+      setUserId(data.id_etudiant);
+      setQuestion(data.question_secrete);
       
-      if (response.ok) {
-        setUserId(data.id_etudiant);
-        setQuestion(data.question_secrete);
-        setStep(2);
-      } else {
-        setError(data.message);
+      // 🔍 Vérifie que la question n'est pas vide
+      if (!data.question_secrete || data.question_secrete.trim() === '') {
+        console.warn("⚠️ La question de sécurité est vide en BDD pour cet utilisateur !");
+        setError("Question de sécurité non configurée. Contactez l'admin.");
+        return;
       }
-    } catch (err) {
-      setError("Le serveur ne répond pas.");
-    } finally {
-      setLoading(false);
+      
+      setStep(2);
+    } else {
+      setError(data.message);
     }
-  };
+  } catch (err) {
+    console.error("❌ Erreur réseau:", err);
+    setError("Le serveur ne répond pas.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Étape 2 : Vérifier la réponse
   const handleVerifyAnswer = async (e) => {

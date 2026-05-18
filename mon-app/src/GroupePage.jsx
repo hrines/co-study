@@ -385,7 +385,7 @@ const handleKick = async (memberId) => {
       if (res.ok) {
         alert("✅ Séance annoncée ! Tous les membres ont été notifiés.");
         setShowSeanceModal(false);
-        setNewSeance({ titre: '', description: '', date_seance: '', lieu: '' });
+        setNewSeance({ titre: '', description: '', date_seance: '' });
         chargerSeances();
       } else {
         const data = await res.json();
@@ -787,15 +787,6 @@ const handleSelectMember = async (userId, userName) => {
                     value={newSeance.date_seance}
                     onChange={(e) => setNewSeance({...newSeance, date_seance: e.target.value})}
                     required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Lieu</label>
-                  <input 
-                    type="text" 
-                    value={newSeance.lieu}
-                    onChange={(e) => setNewSeance({...newSeance, lieu: e.target.value})}
-                    placeholder="Ex: Bibliothèque, Salle A12..."
                   />
                 </div>
               </div>

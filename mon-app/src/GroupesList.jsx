@@ -11,21 +11,46 @@ const GroupesList = () => {
   const [demandesEnvoyees, setDemandesEnvoyees] = useState([]);
   const userFiliere = localStorage.getItem('userFiliere');
 
-  useEffect(() => {
-    // 1. Charger les groupes 
-fetch(`http://localhost:5000/api/groupes/${niveau}?filiere=${userFiliere}`)      .then(res => res.json())
-      .then(data => setGroupes(data))
-      .catch(err => console.error(err));
- // 2.Charger les demandes de l'utilisateur pour griser les boutons
+useEffect(() => {
+  // 1. Récupérer la filière proprement
+  const filiere = localStorage.getItem('userFiliere');
+  const userId = localStorage.getItem('userId');
+  
+  // 2. Charger les groupes (avec ou sans filière)
+  let url = `http://localhost:5000/api/groupes/${niveau}`;
+  if (filiere && filiere !== 'undefined' && filiere !== 'null') {
+    url += `?filiere=${encodeURIComponent(filiere)}`;
+  }
+  
+  console.log("🔄 Chargement groupes depuis:", url);
+  
+  fetch(url)
+    .then(res => {
+      console.log("📡 Status groupes:", res.status);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+      console.log("✅ Groupes reçus:", data?.length || 0);
+      setGroupes(Array.isArray(data) ? data : []);
+    })
+    .catch(err => {
+      console.error("❌ Erreur chargement groupes:", err);
+      setGroupes([]);
+    });
+
+  // 3. Charger les demandes (seulement si userId valide)
+  if (userId && userId !== 'undefined' && userId !== 'null') {
     fetch(`http://localhost:5000/api/mes-demandes/${userId}`)
       .then(res => res.json())
       .then(data => {
-        // On ne garde que les IDs des groupes demandés
-        const ids = data.map(d => d.id_groupe);
+        const ids = Array.isArray(data) ? data.map(d => d.id_groupe) : [];
+        console.log("✅ Demandes envoyées:", ids);
         setDemandesEnvoyees(ids);
       })
-      .catch(err => console.error("Erreur chargement demandes:", err));
-  }, [niveau, userId]);
+      .catch(err => console.error("❌ Erreur demandes:", err));
+  }
+}, [niveau]);
 
   const demanderAdhesion = async (idGroupe) => {
     try {
@@ -37,7 +62,7 @@ fetch(`http://localhost:5000/api/groupes/${niveau}?filiere=${userFiliere}`)     
       const data = await response.json();
       if (response.ok) {
         alert('Demande envoyée au responsable du groupe !');
-        setDemandesEnvoyees([...demandesEnvoyees, idGroupe]); // On grise le bouton
+        setDemandesEnvoyees([...demandesEnvoyees, idGroupe]); 
       } else {
         alert('Erreur : ' + data.message);
       }
